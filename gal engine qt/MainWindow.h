@@ -14,7 +14,8 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
-    void loadGame(); // allow external call (from StartWindow -> Continue)
+    void loadGame(); 
+    void startWindowContinue();// allow external call (from StartWindow -> Continue)
 
 protected:
     void resizeEvent(QResizeEvent* ev) override;
@@ -45,10 +46,15 @@ private:
     ScriptEngine* m_engine;
     AudioManager* m_audio;
 
-    QPushButton* m_returnBtn = nullptr;
     StartWindow* m_startWindow = nullptr;
+
+    QStringList m_history;
+    QString m_currentText;
 
     QPixmap m_bgPixmap;
 
     void layoutUi();
+    void showHistory();
+    void saveToSlot(int slotIndex);
+    void loadFromSlot(int slotIndex);
 };

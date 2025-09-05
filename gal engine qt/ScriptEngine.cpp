@@ -401,3 +401,20 @@ void ScriptEngine::onBackGame() {
     m_startWindow->show();
     this->deleteLater();
 }
+
+void ScriptEngine::saveSnapshotWithMeta(const QString& filename,
+    const QString& screenshotPath,
+    const QString& desc) {
+    QVariantMap m = snapshot(); // µ±Ç°ÓÎÏ·×´Ì¬
+
+    m["desc"] = desc;
+    m["time"] = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    m["screenshot"] = screenshotPath;
+
+    QJsonDocument doc = QJsonDocument::fromVariant(m);
+    QFile f(filename);
+    if (f.open(QIODevice::WriteOnly)) {
+        f.write(doc.toJson(QJsonDocument::Compact));
+        f.close();
+    }
+}

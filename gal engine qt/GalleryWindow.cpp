@@ -14,7 +14,6 @@
 #include <QAudioOutput>
 #include <QPainter>
 
-// ========== 配置变量 ==========
 const float g_scaler = 1.0;
 const QString BACKGROUND_IMAGE_PATH = "";
 const QString LOGO_IMAGE_PATH = "resources/logo.png";
@@ -27,7 +26,6 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
     setWindowTitle("GalEngine - Gallery");
     setFixedSize(1280, 720);
 
-    // 音频设置
     mmm_bgm = new QMediaPlayer(this);
     mmm_bgmOut = new QAudioOutput(this);
     mmm_bgm->setAudioOutput(mmm_bgmOut);
@@ -71,24 +69,22 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
         }
     )");
 
-    // ========== 总体布局 ==========
     auto* mainLayout = new QVBoxLayout(this);
 
-    // ---------- 顶部按钮 ----------
     auto* buttonLayout = new QHBoxLayout();
     cgBtn = new QPushButton("CG", this);
     hsceneBtn = new QPushButton("Hscene", this);
     standBtn = new QPushButton("Stands", this);
+    musicBtn = new QPushButton("Music", this);
     returnBtn = new QPushButton("Return", this);
 
-    QList<QPushButton*> buttons = { cgBtn, hsceneBtn, standBtn, returnBtn };
+    QList<QPushButton*> buttons = { cgBtn, hsceneBtn, standBtn, musicBtn, returnBtn };
     for (auto* btn : buttons) {
         btn->setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT);
         buttonLayout->addWidget(btn);
     }
     mainLayout->addLayout(buttonLayout);
 
-    // ---------- 中部显示区域 ----------
     auto* centerLayout = new QHBoxLayout();
     prevBtn = new QPushButton("<", this);
     nextBtn = new QPushButton(">", this);
@@ -117,15 +113,14 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
 
     setLayout(mainLayout);
 
-    // 连接信号槽
     connect(cgBtn, &QPushButton::clicked, this, &GalleryWindow::onCgGame);
     connect(hsceneBtn, &QPushButton::clicked, this, &GalleryWindow::onHsceneGame);
     connect(standBtn, &QPushButton::clicked, this, &GalleryWindow::onStandGame);
+    connect(musicBtn, &QPushButton::clicked, this, &GalleryWindow::onMusicGame);
     connect(returnBtn, &QPushButton::clicked, this, &GalleryWindow::onReturnGame);
     connect(prevBtn, &QPushButton::clicked, this, &GalleryWindow::showPrevImage);
     connect(nextBtn, &QPushButton::clicked, this, &GalleryWindow::showNextImage);
 
-    // Logo
     logoPixmap.load(LOGO_IMAGE_PATH);
 }
 
@@ -244,7 +239,6 @@ void GalleryWindow::clearImages()
     currentIndex = -1;
     displayLabel->clear();
 
-    // 清除缩略图
     QLayoutItem* child;
     while ((child = previewLayout->takeAt(0)) != nullptr) {
         delete child->widget();
@@ -297,5 +291,47 @@ void GalleryWindow::showNextImage()
     if (currentIndex < imageList.size() - 1) {
         currentIndex++;
         updateDisplay();
+    }
+}
+
+void GalleryWindow::onMusicGame()
+{
+    mmm_se->setSource(QUrl::fromLocalFile("resources/music.mp3"));
+    mmm_se->setLoops(1);
+
+    connect(mmm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
+        if (status == QMediaPlayer::EndOfMedia) {
+            loadMusic("assets/bgm");
+            disconnect(mmm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
+        }
+    });
+
+    mmm_se->play();
+}
+
+void GalleryWindow::loadMusic(const QString& folder)
+{
+    clearImages();
+
+    QDir dir(folder);
+    QStringList filters = { "*.mp3", "*.wav", "*.ogg", "*.m4a" };
+    QFileInfoList files = dir.entryInfoList(filters, QDir::Files);
+
+    for (int i = 0; i < files.size(); ++i) {
+        QString path = files[i].absoluteFilePath();
+        QString name = files[i].baseName();
+
+        QPushButton* musicItem = new QPushButton(name, this);
+        musicItem->setFixedSize(150, 40);
+        previewLayout->addWidget(musicItem);
+
+        connect(musicItem, &QPushButton::clicked, this, [this, path]() {
+            mmm_bgm->stop();
+            mmm_bgm->setSource(QUrl::fromLocalFile(path));
+            mmm_bgm->setLoops(QMediaPlayer::Infinite);
+            mmm_bgm->play();
+
+            displayLabel->setText("Now Playing:\n" + path);
+        });
     }
 }

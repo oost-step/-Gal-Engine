@@ -70,6 +70,9 @@
     <ClCompile Include="GalleryWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SaveLoadWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneTypes.h">
@@ -114,6 +117,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="ClickableLabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SaveLoadWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

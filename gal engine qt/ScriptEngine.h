@@ -42,6 +42,9 @@ public slots:
     void onChoiceSelected(int index);
     void saveSnapshotToFile(const QString& filename);
     void loadSnapshotFromFile(const QString& filename);
+    void saveSnapshotWithMeta(const QString& filename,
+        const QString& screenshotPath,
+        const QString& desc);
 
 private slots:
     void onBackGame();

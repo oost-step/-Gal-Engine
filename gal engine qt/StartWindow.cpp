@@ -200,7 +200,8 @@ void StartWindow::onContinueGame()
         if (status == QMediaPlayer::EndOfMedia) {
             if (!m_mainWindow)
                 m_mainWindow = new MainWindow();
-            m_mainWindow->loadGame();
+            
+            m_mainWindow->startWindowContinue();
             m_mainWindow->show();
             this->close();
 

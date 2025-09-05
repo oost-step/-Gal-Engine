@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# 忽略特定的资源文件（根据你的实际文件名和扩展名修改）
+# 或者直接忽略整个目录，如果你的资源都在一个目录下
+assets/
+resources/

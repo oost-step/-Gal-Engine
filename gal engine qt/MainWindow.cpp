@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ResourceManager.h"
 #include "StartWindow.h"
+#include "SaveLoadWindow.h"
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QMessageBox>
@@ -14,9 +15,11 @@
 #include <QPropertyAnimation>
 #include <QEasingCurve>
 #include <QPushButton>
+#include <QTextEdit>
+#include <QBoxLayout>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-    setWindowTitle("GalEngine Qt6");
+    setWindowTitle("GalEngine");
     //resize(1280, 720);
     setFixedSize(1280, 720);
     setStyleSheet("QMainWindow { background: white; }");
@@ -37,33 +40,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     m_engine = new ScriptEngine(this);
     m_audio = new AudioManager(this);
 
-    // ---------- Return 按钮 ----------
-    m_returnBtn = new QPushButton("Return", this);
-    m_returnBtn->setFixedSize(80, 30);
-    m_returnBtn->move(width() - m_returnBtn->width() - 10, 10); // 右上角位置
-    m_returnBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: rgba(70, 70, 70, 180);
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: rgba(100, 100, 200, 220);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        QPushButton:pressed {
-            background-color: rgba(50, 50, 150, 255);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-        }
-    )");
-
-    connect(m_returnBtn, &QPushButton::clicked, this, &MainWindow::onReturnClicked);
-    m_returnBtn->raise();
 
     connect(m_engine, &ScriptEngine::backgroundChanged, this, &MainWindow::onBackgroundChanged);
     connect(m_engine, &ScriptEngine::spriteChanged, this, &MainWindow::onSpriteChanged);
@@ -98,20 +74,33 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     }
 
     // menu actions
-    auto* fileMenu = menuBar()->addMenu("&File");
-    auto* saveAct = fileMenu->addAction("Save Game");
-    auto* loadAct = fileMenu->addAction("Load Game");
-    connect(saveAct, &QAction::triggered, this, &MainWindow::saveGame);
-    connect(loadAct, &QAction::triggered, this, &MainWindow::loadGameFromDialog);
+    auto* saveAct = menuBar()->addAction("Save");
+    connect(saveAct, &QAction::triggered, this, [this]() {
+        SaveLoadWindow dlg(m_engine, SaveLoadWindow::SaveMode, this);
+        connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
+        connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
+        dlg.exec();
+    });
+
+    auto* loadAct = menuBar()->addAction("Load");
+    connect(loadAct, &QAction::triggered, this, [this]() {
+        SaveLoadWindow dlg(m_engine, SaveLoadWindow::LoadMode, this);
+        connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
+        connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
+        dlg.exec();
+    });
+
+    auto* viewMenu = menuBar()->addMenu("&View");
+    auto* historyAct = viewMenu->addAction("Show History");
+    connect(historyAct, &QAction::triggered, this, &MainWindow::showHistory);
+
+    auto* returnAct = menuBar()->addAction("Return");
+    connect(returnAct, &QAction::triggered, this, &MainWindow::onReturnClicked);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* ev) {
     QMainWindow::resizeEvent(ev);
     layoutUi();
-
-    if (m_returnBtn) {
-        m_returnBtn->move(width() - m_returnBtn->width() - 10, 10);
-    }
 }
 
 void MainWindow::layoutUi() {
@@ -200,6 +189,17 @@ void MainWindow::onSpriteClearedTop(const QString& slot) {
 void MainWindow::onTextReady(const QString& speaker, const QString& text) {
     m_dialogue->setSpeaker(speaker);
     m_dialogue->setText(text);
+
+    // 追加到历史记录
+    QString line = speaker.isEmpty() ? text : QString("%1: %2").arg(speaker, text);
+    m_history.append(line);
+
+    // 限制历史记录长度，避免过大
+    const int maxHistory = 200;
+    if (m_history.size() > maxHistory) {
+        m_history.removeFirst();
+    }
+    m_currentText = text;
 }
 
 void MainWindow::onChoiceRequested(const QString& prompt, const QStringList& options) {
@@ -255,4 +255,65 @@ void MainWindow::onReturnClicked() {
     }
     m_startWindow->show();
     this->close();
+}
+
+void MainWindow::showHistory() {
+    QDialog dlg(this);
+    dlg.setWindowTitle("History");
+    dlg.resize(600, 400);
+
+    QVBoxLayout* layout = new QVBoxLayout(&dlg);
+    QTextEdit* textEdit = new QTextEdit(&dlg);
+    textEdit->setReadOnly(true);
+    textEdit->setText(m_history.join("\n\n"));
+    layout->addWidget(textEdit);
+
+    dlg.setLayout(layout);
+    dlg.exec();
+}
+
+void MainWindow::saveToSlot(int slotIndex) {
+    if (!m_engine) return;
+
+    // 1. 截取当前窗口为缩略图
+    QPixmap screenshot = this->grab();
+    QString screenshotPath = QString("save_slot_%1.png").arg(slotIndex);
+    screenshot = screenshot.scaled(320, 180, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    screenshot.save(screenshotPath, "PNG");
+
+    // 2. 获取存档描述：取对话框当前文本前 30 个字符
+    QString desc;
+    if (m_dialogue) {
+        desc = m_currentText;
+        if (desc.length() > 30) desc = desc.left(30) + "...";
+    }
+
+    // 3. 调用 ScriptEngine 保存
+    QString jsonFile = QString("save_slot_%1.json").arg(slotIndex);
+    m_engine->saveSnapshotWithMeta(jsonFile, screenshotPath, desc);
+
+    // 4. 提示用户
+    statusBar()->showMessage(QString("Saved to slot %1").arg(slotIndex), 3000);
+}
+
+void MainWindow::loadFromSlot(int slotIndex) {
+    if (!m_engine) return;
+
+    QString jsonFile = QString("save_slot_%1.json").arg(slotIndex);
+    if (!QFile::exists(jsonFile)) {
+        statusBar()->showMessage(QString("Slot %1 is empty").arg(slotIndex), 3000);
+        return;
+    }
+
+    m_engine->loadSnapshotFromFile(jsonFile);
+
+    statusBar()->showMessage(QString("Loaded from slot %1").arg(slotIndex), 3000);
+}
+
+void MainWindow::startWindowContinue()
+{
+    SaveLoadWindow dlg(m_engine, SaveLoadWindow::LoadMode, this);
+    connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
+    connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
+    dlg.exec();
 }
