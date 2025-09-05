@@ -1,0 +1,374 @@
+{
+  "start": "prologue",
+  "scenes": [
+    {
+      "id": "prologue",
+      "background": "assets/bg/black.png",
+      "music": "assets/bgm/Android.mp3",
+      "lines": [
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "“我不能停下双手”"
+        },
+        {
+          "speaker": " ",
+          "text": "我不断对自己说到"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/digging.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "1800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/black.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "speaker": " ",
+          "text": "哪怕只是片刻的停歇，我的心便会不由自主地沉浸在往昔之中。"
+        },
+        {
+          "speaker": " ",
+          "text": "那段回忆温馨、美丽，又包含爱意——也让人痛惜。"
+        },
+        {
+          "speaker": " ",
+          "text": "一旦沉浸其中，或许我将再也无法回到现实。"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/digging.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "1800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/black.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "speaker": " ",
+          "text": "所以，我没法停下双手的动作。"
+        },
+        {
+          "speaker": " ",
+          "text": "我放空大脑，不断扩大着地面的坑洞。"
+        },
+        {
+          "speaker": " ",
+          "text": "什么也不去想"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/digging2.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "1800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/black.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "speaker": " ",
+          "text": "但是，我做不到。"
+        },
+        {
+          "speaker": " ",
+          "text": "我的心，飞了回去。"
+        },
+        {
+          "speaker": " ",
+          "text": "划过我心中的是普通的，单纯的一日光景。"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/white.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "speaker": " ",
+          "text": "那个时候，她——"
+        },
+        {
+          "cmd": "goto",
+          "args": { "scene": "first" }
+        }
+      ]
+    },
+    {
+      "id": "first",
+      "background": "assets/bg/evening.jpg",
+      "lines": [
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "她躺在废品回收站里。"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/lucy_throw.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "在那之后，是一段幸福的时光......"
+        },
+        {
+          "speaker": " ",
+          "text": "可是"
+        },
+        {
+          "speaker": " ",
+          "text": "可是，我却回想不起她的声音"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/lucy_cry.png" }
+        },
+        {
+          "speaker": "???",
+          "text": "......"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/lucy_fade.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "1800" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/white.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "speaker": " ",
+          "text": "！！！"
+        },
+        {
+          "speaker": " ",
+          "text": "啊"
+        },
+        {
+          "speaker": " ",
+          "text": "是这样啊......"
+        },
+        {
+          "speaker": " ",
+          "text": "已经，来不及了......"
+        },
+        {
+          "cmd": "goto",
+          "args": { "scene": "second" }
+        }
+      ]
+    },
+    {
+      "id": "second",
+      "background": "assets/bg/black.png",
+      "lines": [
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "屋子里很暗"
+        },
+        {
+          "speaker": " ",
+          "text": "可是我很清楚"
+        },
+        {
+          "speaker": " ",
+          "text": "她就在那里，坐在地上"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/yuki_dead.jpg" }
+        },
+        {
+          "speaker": "？？？",
+          "text": "还是没赶上吗"
+        },
+        {
+          "speaker": "？？？",
+          "text": "没办法了"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/black.png" }
+        },
+        {
+          "cmd": "goto",
+          "args": { "scene": "choices" }
+        }
+      ]
+    },
+    {
+      "id": "choices",
+      "background": "assets/bg/black.png",
+      "lines": [
+        {
+          "speaker": "？？？",
+          "text": "屏幕那一边的人啊",
+          "sprite": "assets/ch/sophi.png",
+          "slot": "left"
+        },
+        {
+          "speaker": "？？？",
+          "text": "我已经失去所有了"
+        },
+        {
+          "speaker": "？？？",
+          "text": "接下来的选择，就交给你了"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/morning.jpg" }
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "choice": {
+            "prompt": " ",
+            "options": [
+              {
+                "text": "A",
+                "goto": "prologue"
+              },
+              {
+                "text": "B",
+                "goto": "first"
+              },
+              {
+                "text": "C",
+                "goto": "second"
+              },
+              {
+                "text": "D",
+                "goto": "true"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "true",
+      "background": "assets/bg/morning.jpg",
+      "music": "assets/bgm/intro2.m4a",
+      "lines": [
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "cmd": "se",
+          "args": { "path": "assets/se/ciao.wav" }
+        },
+        {
+          "speaker": "有希",
+          "text": "嘿！你在发什么呆呢！快过来！",
+          "sprite": "assets/ch/nagato.png",
+          "slot": "left",
+          "psprite": "assets/ch/nagato_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "有希一把抓住你的胳膊，跑向前去"
+        },
+        {
+          "speaker": " ",
+          "text": "眼前的景象一片祥和，令人有些诧异"
+        },
+        {
+          "speaker": " ",
+          "text": "看着有希可爱的脸蛋，我不禁有些愣神"
+        },
+        {
+          "speaker": "？？？",
+          "text": "总算是，成功了吗......",
+          "psprite": "assets/ch/yuki_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear"
+        },
+        {
+          "speaker": " ",
+          "text": "终"
+        },
+        {
+          "cmd": "end"
+        }
+      ]
+    }
+  ]
+}
