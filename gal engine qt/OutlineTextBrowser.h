@@ -4,6 +4,7 @@
 #include <QPainterPath>
 #include <QTimer>
 #include <QMouseEvent>
+#include <QTextLayout>
 
 class OutlineTextBrowser : public QLabel {
     Q_OBJECT
@@ -12,6 +13,8 @@ public:
         : QLabel(parent), m_displayDelay(50), m_currentIndex(0), m_animationComplete(false) {
         m_timer = new QTimer(this);
         connect(m_timer, &QTimer::timeout, this, &OutlineTextBrowser::updateText);
+
+        setWordWrap(true);   // 启用 QLabel 的换行属性（便于计算大小）
     }
 
     // 设置逐字显示的延迟时间（毫秒）
@@ -22,75 +25,95 @@ public:
         }
     }
 
-    // 获取当前延迟时间
-    int displayDelay() const {
-        return m_displayDelay;
-    }
+    int displayDelay() const { return m_displayDelay; }
 
     // 设置文本并启动打字机效果
     void setTextWithAnimation(const QString& text) {
         m_fullText = text;
         m_currentIndex = 0;
         m_animationComplete = false;
-        QLabel::setText("");
+        QLabel::setText(""); // 清空 QLabel 内部缓存
         m_timer->start(m_displayDelay);
+        update();
     }
 
-    // 重写setText以保持兼容性
+    // 重写 setText 保持兼容性
     void setText(const QString& text) {
         m_fullText = text;
         m_currentIndex = 0;
         m_animationComplete = false;
-        QLabel::setText("");
+        QLabel::setText(""); // 清空 QLabel 内部缓存
         m_timer->start(m_displayDelay);
+        update();
     }
 
-    // 跳过动画，立即显示全部文本
     void skipAnimation() {
         if (!m_animationComplete) {
             m_timer->stop();
             m_currentIndex = m_fullText.length();
             m_animationComplete = true;
-            QLabel::setText(m_fullText);
             update();
         }
     }
 
-    // 检查动画是否完成
-    bool isAnimationComplete() const {
-        return m_animationComplete;
-    }
+    bool isAnimationComplete() const { return m_animationComplete; }
 
 signals:
     void clicked();
 
 protected:
     void paintEvent(QPaintEvent* event) override {
+        Q_UNUSED(event);
+
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::TextAntialiasing);
 
         QFont font = this->font();
+        QFontMetrics fm(font);
+
         QString displayText = m_animationComplete ? m_fullText : m_fullText.left(m_currentIndex);
 
-        QPainterPath path;
-        path.addText(0, fontMetrics().ascent(), font, displayText);
+        // 使用 QTextLayout 实现自动换行
+        QTextLayout textLayout(displayText, font);
+        textLayout.beginLayout();
+        QVector<QTextLine> lines;
+        while (true) {
+            QTextLine line = textLayout.createLine();
+            if (!line.isValid())
+                break;
+            line.setLineWidth(width());
+            lines.append(line);
+        }
+        textLayout.endLayout();
 
-        // 半透明黄色描边
-        QPen pen(QColor(255, 255, 0, 180)); // 半透明黄色
-        pen.setWidth(0.6);                    // 轮廓粗细（可调）
+        // 逐行绘制带轮廓的文字
+        QPainterPath path;
+        for (int i = 0; i < lines.size(); ++i) {
+            QTextLine line = lines.at(i);
+            qreal y = fm.ascent() + i * fm.lineSpacing();
+            QString lineText = displayText.mid(line.textStart(), line.textLength());
+            path.addText(0, y, font, lineText);
+        }
+
+        // 描边
+        QPen pen(QColor(255, 255, 0, 180));
+        pen.setWidthF(1.2);
         painter.setPen(pen);
-        painter.setBrush(Qt::white);        // 填充颜色
+        painter.setBrush(Qt::white);
         painter.drawPath(path);
     }
 
     void mousePressEvent(QMouseEvent* event) override {
         if (event->button() == Qt::LeftButton) {
-            if (!m_animationComplete) skipAnimation();
-            else emit clicked();
+            if (!m_animationComplete)
+                skipAnimation();
+            else
+                emit clicked();
         }
         QLabel::mousePressEvent(event);
     }
+
 private slots:
     void updateText() {
         if (m_currentIndex < m_fullText.length()) {

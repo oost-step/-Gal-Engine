@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         json = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
     }
     if (!json.isEmpty() && m_engine->loadFromJsonFile(json)) {
-        statusBar()->showMessage("Loaded script: " + json);
+        //statusBar()->showMessage("Loaded script: " + json);
         m_engine->start();
     }
     else {
@@ -211,28 +211,28 @@ void MainWindow::onPreloadRequested(const QStringList& images, const QStringList
     rm.preloadImages(images);
     for (const auto& a : audios) rm.registerAudio(a);
     if (!images.isEmpty() || !audios.isEmpty()) {
-        statusBar()->showMessage(QString("Preloaded %1 images, %2 audios").arg(images.count()).arg(audios.count()), 3000);
+        //statusBar()->showMessage(QString("Preloaded %1 images, %2 audios").arg(images.count()).arg(audios.count()), 3000);
     }
 }
 
 void MainWindow::onAutosavePoint(const QString& name) {
     QString fn = QDir::current().filePath(QString("autosave_%1.json").arg(name));
     m_engine->saveSnapshotToFile(fn);
-    statusBar()->showMessage("Autosaved: " + fn, 3000);
+    //statusBar()->showMessage("Autosaved: " + fn, 3000);
 }
 
 void MainWindow::saveGame() {
     QString fn = QFileDialog::getSaveFileName(this, "Save Game", QDir::currentPath(), "Save (*.json)");
     if (fn.isEmpty()) return;
     m_engine->saveSnapshotToFile(fn);
-    statusBar()->showMessage("Saved: " + fn, 3000);
+    //statusBar()->showMessage("Saved: " + fn, 3000);
 }
 
 void MainWindow::loadGameFromDialog() {
     QString fn = QFileDialog::getOpenFileName(this, "Load Game", QDir::currentPath(), "Save (*.json)");
     if (fn.isEmpty()) return;
     m_engine->loadSnapshotFromFile(fn);
-    statusBar()->showMessage("Loaded: " + fn, 3000);
+    //statusBar()->showMessage("Loaded: " + fn, 3000);
 }
 
 void MainWindow::loadGame() {
@@ -240,7 +240,7 @@ void MainWindow::loadGame() {
     QString fn = QDir::current().filePath("autosave_last.json");
     if (QFile::exists(fn)) {
         m_engine->loadSnapshotFromFile(fn);
-        statusBar()->showMessage("Loaded: " + fn, 3000);
+        //statusBar()->showMessage("Loaded: " + fn, 3000);
     }
     else {
         // select
@@ -293,7 +293,7 @@ void MainWindow::saveToSlot(int slotIndex) {
     m_engine->saveSnapshotWithMeta(jsonFile, screenshotPath, desc);
 
     // 4. 提示用户
-    statusBar()->showMessage(QString("Saved to slot %1").arg(slotIndex), 3000);
+    //statusBar()->showMessage(QString("Saved to slot %1").arg(slotIndex), 3000);
 }
 
 void MainWindow::loadFromSlot(int slotIndex) {
@@ -301,13 +301,13 @@ void MainWindow::loadFromSlot(int slotIndex) {
 
     QString jsonFile = QString("save_slot_%1.json").arg(slotIndex);
     if (!QFile::exists(jsonFile)) {
-        statusBar()->showMessage(QString("Slot %1 is empty").arg(slotIndex), 3000);
+        //statusBar()->showMessage(QString("Slot %1 is empty").arg(slotIndex), 3000);
         return;
     }
 
     m_engine->loadSnapshotFromFile(jsonFile);
 
-    statusBar()->showMessage(QString("Loaded from slot %1").arg(slotIndex), 3000);
+    //statusBar()->showMessage(QString("Loaded from slot %1").arg(slotIndex), 3000);
 }
 
 void MainWindow::startWindowContinue()

@@ -1,8 +1,8 @@
 {
-  "start": "prologue",
+  "start": "morning",
   "scenes": [
     {
-      "id": "prologue",
+      "id": "morning",
       "background": "assets/bg/black.png",
       "music": "assets/bgm/Android.mp3",
       "lines": [
@@ -12,55 +12,23 @@
         },
         {
           "speaker": " ",
-          "text": "“我不能停下双手”"
+          "text": "清晨。"
         },
         {
           "speaker": " ",
-          "text": "我不断对自己说到"
+          "text": "感受到有人在摇动我的身体，我从睡眠的深渊中挣脱。"
         },
         {
           "cmd": "wait",
-          "args": { "ms": "800" }
+          "args": { "ms": "600" }
         },
         {
           "cmd": "bg",
-          "args": { "path": "assets/bg/digging.png" }
+          "args": { "path": "assets/bg/gray.png" }
         },
         {
           "cmd": "wait",
-          "args": { "ms": "1800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/black.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
-        },
-        {
-          "speaker": " ",
-          "text": "哪怕只是片刻的停歇，我的心便会不由自主地沉浸在往昔之中。"
-        },
-        {
-          "speaker": " ",
-          "text": "那段回忆温馨、美丽，又包含爱意——也让人痛惜。"
-        },
-        {
-          "speaker": " ",
-          "text": "一旦沉浸其中，或许我将再也无法回到现实。"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/digging.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "1800" }
+          "args": { "ms": "200" }
         },
         {
           "cmd": "bg",
@@ -71,16 +39,477 @@
           "args": { "ms": "500" }
         },
         {
-          "speaker": " ",
-          "text": "所以，我没法停下双手的动作。"
+          "speaker": "结",
+          "text": "哥哥，早上了，该起床了。",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
         },
         {
           "speaker": " ",
-          "text": "我放空大脑，不断扩大着地面的坑洞。"
+          "text": "如此这般传来的可爱声音，来自于我的妹妹结。"
+        },
+        {
+          "speaker": "仁",
+          "text": "让我再睡一会啦。昨晚睡太迟了。"
         },
         {
           "speaker": " ",
-          "text": "什么也不去想"
+          "text": "我嘟囔着，翻了个身。"
+        },
+        {
+          "speaker": " ",
+          "text": "但是妹妹的声音依然在耳边喋喋不休。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥哥！再不起床，我可要生气了！",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": "仁",
+          "text": "结生气一点也不可怕。"
+        },
+        {
+          "speaker": " ",
+          "text": "听到这句话，其实我已经清醒了大半。但由于好奇生气的结会是什么样子的，我依然闭着眼睛，躺在床上装睡。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥哥要是不起来的话，我、我就要用力亲哥哥了哦！",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/bedroom.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "这可不行。所以我立刻坐起身，摆出一副刚睡醒的样子。"
+        },
+        {
+          "speaker": "仁",
+          "text": "哥哥已经起来了结冷静别这样"
+        },
+        {
+          "speaker": " ",
+          "text": "好在是虚惊一场，看样子妹妹大人已经去厨房了。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "正揉着惺忪的睡眼，又从厨房传来了妹妹的呼唤。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥！来吃早饭了！妹妹的爱心特制喔！",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "为了不让亲爱的妹妹久等，我加快了换衣服的速度。"
+        },
+        {
+          "speaker": " ",
+          "text": "穿好校服，确认过书包里的东西都装好了，我来到卫生间洗漱。"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/dinningroom.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "经过餐厅的时候，发现我家妹妹已经先吃上饭了。"
+        },
+        {
+          "speaker": " ",
+          "text": "一片面包，一片培根再加一个煎蛋，是我们兄妹两从小就最喜欢的早饭。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥哥大懒虫。而且，头发也乱糟糟的。",
+          "sprite": "assets/ch/yui_angry.png",
+          "slot": "left",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "被妹妹嘲讽了。"
+        },
+        {
+          "speaker": "仁",
+          "text": "啰嗦。我马上就去把它整理好啦。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/washroom.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "对着镜子，仔仔细细地把头发梳了一遍。"
+        },
+        {
+          "speaker": " ",
+          "text": "今天虽然不是什么特别的日子，但我有种预感，会有好事发生。"
+        },
+        {
+          "speaker": " ",
+          "text": "所以想以清爽的心情面对。"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/dinningroom.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "路过厨房，从冰箱里拿出三明治与牛奶，坐到妹妹面前，再顺手打开电视。"
+        },
+        {
+          "speaker": "结",
+          "text": "又有人失踪了吗？最近这种事发生得也太多了。",
+          "sprite": "assets/ch/yui_common.png",
+          "slot": "left",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "妹妹看着电视里的新闻，忧心忡忡地说。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": "仁",
+          "text": "是么？我倒觉得还好。"
+        },
+        {
+          "speaker": " ",
+          "text": "我则有些不以为意。这些事情无非是幸存者偏差罢了。"
+        },
+        {
+          "speaker": " ",
+          "text": "只有失踪的人才会上电视，看电视的话，自然就会觉得失踪的人多得不行。"
+        },
+        {
+          "speaker": " ",
+          "text": "但是现实生活里，身边有人失踪的事可不多见。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥哥怎么这样。那，假如我失踪了，哥哥也会觉得“还好”吗？",
+          "sprite": "assets/ch/yui_angry.png",
+          "slot": "left",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "妹妹嘟着嘴回应我。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": "仁",
+          "text": "结怎么会这么想？放心，要是你失踪了，哥哥跑遍世界也会把你找回来的。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "慢悠悠地吃着早饭，一如既往地和妹妹有一搭没一搭地聊天，对我而言，就是无上的幸福了。"
+        },
+        {
+          "speaker": "结",
+          "text": "再不快点吃的话，可是要迟到了喔！",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "妹妹看着时钟，提醒我。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "（时钟显示7点半）"
+        },
+        {
+          "speaker": "仁",
+          "text": "不是吧，这么迟了？"
+        },
+        {
+          "speaker": " ",
+          "text": "似乎是刚才的洗漱花了太久，现在已经来到路上稍微出点意外就赶不上早读的危险时间。"
+        },
+        {
+          "speaker": " ",
+          "text": "我三下五除二吃掉三明治，再把牛奶一口气灌进肚子里。抓起背包就往门外冲。"
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/morning.jpg" }
+        },
+        {
+          "speaker": " ",
+          "text": "当然，没忘了和妹妹说声“再见”，再关掉电视，带上门，把它锁好。"
+        },
+        {
+          "speaker": "结",
+          "text": "哥哥再见。路上小心！",
+          "psprite": "assets/ch/yui_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "身后传来妹妹的告别声，依然是那么悦耳。"
+        },
+        {
+          "speaker": " ",
+          "text": "我不由得感叹，有这样的妹妹真是我的荣幸。"
+        },
+        {
+          "cmd": "goto",
+          "args": { "scene": "waytoschool" }
+        }
+      ]
+    },
+    {
+      "id": "waytoschool",
+      "background": "assets/bg/street.png",
+      "lines": [
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "但有句话说得好，人越不希望什么事发生，那件事就越容易发生。"
+        },
+        {
+          "speaker": " ",
+          "text": "出门前我还在想，只要路上不出意外，我肯定能准时赶学校。偏偏，意外就发生了。"
+        },
+        {
+          "speaker": " ",
+          "text": "就当我急着冲过一条绿灯时间奇短无比，红灯时间却长到足有半辈子长的斑马线时，"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "600" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/gray.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "200" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/street.png" }
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "200" }
+        },
+        {
+          "speaker": " ",
+          "text": "从身侧突然冲出来一辆自行车，让我结结实实吃了一记。"
+        },
+        {
+          "speaker": "? ? ?",
+          "text": "好痛......真是的，你跑这么急干什么呀？",
+          "psprite": "assets/ch/taki_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "躺在地上我还没说话，那个骑自行车的人就怪起我来了。"
+        },
+        {
+          "speaker": " ",
+          "text": "声音尖细，听起来是和我同龄的女生。"
+        },
+        {
+          "speaker": " ",
+          "text": "虽然过马路时没有左右看的确是我的问题，但我敢肯定，绝对是她的问题更大。视线正常的人绝对能在800米开外就看到正在过斑马线的我，更别提此时是绿灯，不过街什么时候过？"
+        },
+        {
+          "speaker": " ",
+          "text": "全身上下都在因为撞击而作痛。我抬起眼睛，发现骑自行车的女生穿着和我一样的校服，应该是同校同学。",
+          "sprite": "assets/ch/taki_common.png",
+          "slot": "left"
+        },
+        {
+          "speaker": " ",
+          "text": "所以我没好气地回了一句"
+        },
+        {
+          "speaker": "仁",
+          "text": "不跑，等着迟到吗？"
+        },
+        {
+          "speaker": "? ? ?",
+          "text": "迟到？不是离上课还有半小时吗？",
+          "psprite": "assets/ch/taki_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "听到我这么说，她似乎愣住了。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": "仁",
+          "text": "半小时？你在说什么？离早读只剩下五分钟不到了啊。"
+        },
+        {
+          "speaker": " ",
+          "text": "怎么会有人连自己学校什么时间上课都不知道？她的回答让我更疑惑了。"
+        },
+        {
+          "speaker": "? ? ?",
+          "text": "我该不会记错时间了吧？完蛋了！",
+          "sprite": "assets/ch/taki_shock.png",
+          "slot": "left",
+          "psprite": "assets/ch/taki_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "speaker": " ",
+          "text": "少女露出震惊的神情，下意识就想骑着自行车冲出去。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "但下一刻，她似乎终于意识到我还倒在地上，冲我伸出右手。",
+          "sprite": "assets/ch/taki_shy.png",
+          "slot": "left"
+        },
+        {
+          "speaker": "? ? ?",
+          "text": "你没事吧？对不起。我扶你起来。",
+          "psprite": "assets/ch/taki_profile.png",
+          "pslot": "pleft"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "pleft" }
+        },
+        {
+          "speaker": " ",
+          "text": "我握住她的手，借力从地上站起。突然，她左手抖动一下，往我身上丢了些白色的粉末。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "left" }
+        },
+        {
+          "speaker": " ",
+          "text": "这是什么东西？我忍不住皱眉。但当我想立刻把这些粉末状东西拍掉时，定睛一看，我身上却没有丝毫异物。"
+        },
+        {
+          "speaker": " ",
+          "text": "错觉吗？我还在思索，那女生就一骑着自行车一溜烟跑远了。"
+        },
+        {
+          "speaker": " ",
+          "text": "“喂！你撞了人就跑吗？”我想这么谴责她，但看她离去的速度，想来这样的话语不会有任何用处。再加上早读开始的时间已然迫在眉睫，比起在意这些，还是迈开步伐更有意义。"
+        },
+        {
+          "speaker": " ",
+          "text": "话说，我身体上的疼痛似乎不见了。好得真快。"
+        },
+
+        {
+          "speaker": " ",
+          "text": "加速脚步，紧赶慢赶，我还是没能在早读开始前冲过学校门口。不过值得庆幸的是，班上正传来一阵喧哗。"
+        },
+
+
+
+
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/lucy_throw.png" }
+        },
+        {
+          "speaker": " ",
+          "text": "在那之后，是一段幸福的时光......"
+        },
+        {
+          "speaker": " ",
+          "text": "可是"
+        },
+        {
+          "speaker": " ",
+          "text": "可是，我却回想不起她的声音"
+        },
+        {
+          "cmd": "wait",
+          "args": { "ms": "500" }
+        },
+        {
+          "cmd": "bg",
+          "args": { "path": "assets/bg/lucy_cry.png" }
+        },
+        {
+          "speaker": "???",
+          "text": "......"
         },
         {
           "cmd": "wait",
@@ -88,35 +517,11 @@
         },
         {
           "cmd": "bg",
-          "args": { "path": "assets/bg/digging2.png" }
+          "args": { "path": "assets/bg/lucy_fade.png" }
         },
         {
           "cmd": "wait",
           "args": { "ms": "1800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/black.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
-        },
-        {
-          "speaker": " ",
-          "text": "但是，我做不到。"
-        },
-        {
-          "speaker": " ",
-          "text": "我的心，飞了回去。"
-        },
-        {
-          "speaker": " ",
-          "text": "划过我心中的是普通的，单纯的一日光景。"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
         },
         {
           "cmd": "bg",
@@ -128,11 +533,23 @@
         },
         {
           "speaker": " ",
-          "text": "那个时候，她——"
+          "text": "！！！"
+        },
+        {
+          "speaker": " ",
+          "text": "啊"
+        },
+        {
+          "speaker": " ",
+          "text": "是这样啊......"
+        },
+        {
+          "speaker": " ",
+          "text": "已经，来不及了......"
         },
         {
           "cmd": "goto",
-          "args": { "scene": "first" }
+          "args": { "scene": "second" }
         }
       ]
     },
