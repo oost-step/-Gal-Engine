@@ -141,7 +141,7 @@ void ImageLayer::layoutSprites() {
     const int h = height();
     const int baseW = w / 3;
     const int baseH = h;
-    m_left->setGeometry(260, 0, 510, 720);
+    m_left->setGeometry(640 - 255, 0, 510, 720);
     //m_center->setGeometry((w - baseW) / 2, h - baseH, baseW, baseH);
     m_right->setGeometry(260 + 510, 0, 510, 720);
     m_pleft->setGeometry(0, 460, 260, 260);
@@ -210,7 +210,7 @@ void ImageLayerTop::layoutSprites() {
     const int h = height();
     const int baseW = w / 3;
     const int baseH = h;
-    m_left->setGeometry(260, 0, 510, 720);
+    m_left->setGeometry(640 - 255, 0, 510, 720);
     //m_center->setGeometry((w - baseW) / 2, h - baseH, baseW, baseH);
     m_right->setGeometry(260 + 510, 0, 510, 720);
     m_pleft->setGeometry(0, 460, 260, 260);
