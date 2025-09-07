@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QBoxLayout>
+#include <QSequentialAnimationGroup>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("GalEngine");
@@ -50,6 +51,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(m_engine, &ScriptEngine::choiceRequested, this, &MainWindow::onChoiceRequested);
     connect(m_engine, &ScriptEngine::preloadRequested, this, &MainWindow::onPreloadRequested);
     connect(m_engine, &ScriptEngine::autosavePoint, this, &MainWindow::onAutosavePoint);
+    connect(m_engine, &ScriptEngine::shakeWindow, this, &MainWindow::onShakeWindow);
+    connect(m_engine, &ScriptEngine::close, this, &MainWindow::onClose);
 
     connect(m_engine, &ScriptEngine::stopBgm, m_audio, &AudioManager::stopBgm);
     connect(m_engine, &ScriptEngine::playBgm, m_audio, &AudioManager::playBgm);
@@ -346,4 +349,75 @@ void MainWindow::startWindowContinue()
     connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
     connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
     dlg.exec();
+}
+
+void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
+{
+    if (amplitude <= 0) {
+        shakeCount = 50;
+    }
+    if (shakeCount <= 0) {
+        shakeCount = 10;
+    }
+    if (duration <= 0) {
+        duration = 1500;
+    }
+
+    if (m_shakeAnimation) {
+        if (m_shakeAnimation->state() == QAbstractAnimation::Running) {
+            m_shakeAnimation->stop();
+        }
+        delete m_shakeAnimation;
+        m_shakeAnimation = nullptr;
+    }
+
+    // 保存每个子控件的初始位置
+    QList<QWidget*> widgets = this->findChildren<QWidget*>();
+    QMap<QWidget*, QPoint> initialPosMap;
+    for (QWidget* w : widgets) {
+        if (w->isWindow()) continue; // 跳过子窗口
+        initialPosMap[w] = w->pos();
+    }
+
+    // 使用 QVariantAnimation 统一驱动
+    QVariantAnimation* anim = new QVariantAnimation(this);
+    m_shakeAnimation = anim;
+
+    anim->setDuration(duration);
+    anim->setStartValue(0.0);
+    anim->setEndValue(1.0);
+    anim->setEasingCurve(QEasingCurve::Linear); // 我们手动控制轨迹
+
+    connect(anim, &QVariantAnimation::valueChanged, this, [=](const QVariant& value) {
+        double progress = value.toDouble(); // [0,1]
+        double angle = progress * shakeCount * 2 * M_PI; // 摆动角度
+        double decay = 1.0 - progress;                  // 衰减因子（让后面震动幅度变小）
+
+        // 偏移路径：圆形/椭圆形轨迹，带衰减
+        double dx = amplitude * decay * std::sin(angle);
+        double dy = amplitude * decay * std::cos(angle * 0.8); // 0.8制造椭圆感
+
+        QPoint offset((int)dx, (int)dy);
+
+        for (auto it = initialPosMap.begin(); it != initialPosMap.end(); ++it) {
+            QWidget* w = it.key();
+            QPoint base = it.value();
+            w->move(base + offset);
+        }
+    });
+
+    connect(anim, &QVariantAnimation::finished, this, [=]() {
+        // 归位
+        for (auto it = initialPosMap.begin(); it != initialPosMap.end(); ++it) {
+            it.key()->move(it.value());
+        }
+    });
+
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+
+void MainWindow::onClose()
+{
+    this->close();
 }

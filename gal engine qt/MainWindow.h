@@ -37,6 +37,10 @@ private slots:
 
     void onReturnClicked();
 
+    void onShakeWindow(int amplitude = 5, int duration = 500, int shakeCount = 5);
+
+    void onClose();
+
 signals:
     void playSound(const QString& path);
 
@@ -55,6 +59,8 @@ private:
     QString m_currentText;
 
     QPixmap m_bgPixmap;
+
+    QAbstractAnimation* m_shakeAnimation = nullptr;
 
     void layoutUi();
     void showHistory();

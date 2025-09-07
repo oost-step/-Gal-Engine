@@ -37,6 +37,8 @@ signals:
     void scriptEnded();
     void preloadRequested(const QStringList& imagePaths, const QStringList& audioPaths);
     void autosavePoint(const QString& name);
+    void shakeWindow(const int amplitude,const int duration,const int shakeCount);
+    void close();
 
 public slots:
     void advance();

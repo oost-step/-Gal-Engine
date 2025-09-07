@@ -208,6 +208,13 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
         }
         advance();
     }
+    else if (c == "shake") {
+        int A = ln.args.value("A").toInt();//幅度  像素
+        int D = ln.args.value("D").toInt();//持续时间  毫秒
+        int C = ln.args.value("C").toInt();//次数  次数
+        emit shakeWindow(A, D, C);
+        advance();
+    }
     else if (c == "goto" || c == "jump") {
         const QString target = ln.args.value("scene").toString();
         const QString saveName = ln.args.value("save").toString();
@@ -216,9 +223,15 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
             m_currentSceneId = target; m_lineIndex = 0;
             emit sceneEntered(m_currentSceneId);
             const auto& nsc = m_script.scenes[m_currentSceneId];
-            if (!nsc.musicPath.isEmpty()) emit playBgm(nsc.musicPath);
-            if (!nsc.backgroundPath.isEmpty()) emit backgroundChanged(nsc.backgroundPath);
-            if (!saveName.isEmpty()) emit autosavePoint(saveName);
+            if (!nsc.musicPath.isEmpty()) {
+                m_currentBgm = nsc.musicPath;
+                emit playBgm(nsc.musicPath);
+            }
+            if (!nsc.backgroundPath.isEmpty()) {
+                m_currentBackground = nsc.backgroundPath;
+                emit backgroundChanged(nsc.backgroundPath);
+            }
+            //if (!saveName.isEmpty()) emit autosavePoint(saveName);
         }
         advance();
     }
@@ -239,8 +252,14 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
                 m_currentSceneId = ts; m_lineIndex = 0;
                 emit sceneEntered(m_currentSceneId);
                 const auto& nsc = m_script.scenes[m_currentSceneId];
-                if (!nsc.musicPath.isEmpty()) emit playBgm(nsc.musicPath);
-                if (!nsc.backgroundPath.isEmpty()) emit backgroundChanged(nsc.backgroundPath);
+                if (!nsc.musicPath.isEmpty()) {
+                    m_currentBgm = nsc.musicPath;
+                    emit playBgm(nsc.musicPath);
+                }
+                if (!nsc.backgroundPath.isEmpty()) {
+                    m_currentBackground = nsc.backgroundPath;
+                    emit backgroundChanged(nsc.backgroundPath);
+                }
             }
         }
         else {
@@ -249,8 +268,14 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
                 m_currentSceneId = fs; m_lineIndex = 0;
                 emit sceneEntered(m_currentSceneId);
                 const auto& nsc = m_script.scenes[m_currentSceneId];
-                if (!nsc.musicPath.isEmpty()) emit playBgm(nsc.musicPath);
-                if (!nsc.backgroundPath.isEmpty()) emit backgroundChanged(nsc.backgroundPath);
+                if (!nsc.musicPath.isEmpty()) {
+                    m_currentBgm = nsc.musicPath;
+                    emit playBgm(nsc.musicPath);
+                }
+                if (!nsc.backgroundPath.isEmpty()) {
+                    m_currentBackground = nsc.backgroundPath;
+                    emit backgroundChanged(nsc.backgroundPath);
+                }
             }
         }
         advance();
@@ -412,7 +437,7 @@ void ScriptEngine::onBackGame() {
         m_startWindow = new StartWindow();
     }
     m_startWindow->show();
-    this->deleteLater();
+    emit close();
 }
 
 void ScriptEngine::saveSnapshotWithMeta(const QString& filename,
