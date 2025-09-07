@@ -63,10 +63,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     layoutUi();
 
     // Load script
-    QString jsonPath = QDir::current().filePath("script.json");
-    if (!ResourceManager::instance().loadTextFile(jsonPath).isEmpty()) {
-        if (m_engine->loadFromJsonFile(jsonPath)) {
-            //statusBar()->showMessage("Loaded script: " + jsonPath);
+    QString jsonPath;
+    if (ResourceManager::USE_PACKED_RESOURCES) {
+        jsonPath = "assets/script.json";
+    }
+    else {
+        jsonPath = QDir::current().filePath("script.json");
+    }
+
+    QString script = ResourceManager::instance().loadTextFile(jsonPath);
+
+    if (script.isNull()) {
+        jsonPath = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
+        if (!jsonPath.isEmpty() && m_engine->loadFromJsonFile(jsonPath)) {
             m_engine->start();
         }
         else {
@@ -74,16 +83,35 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         }
     }
     else {
-        jsonPath = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
-        if (!jsonPath.isEmpty() && m_engine->loadFromJsonFile(jsonPath)) {
-            //statusBar()->showMessage("Loaded script: " + jsonPath);
+        if (m_engine->loadFromJsonFile(jsonPath)) {
             m_engine->start();
         }
         else {
             QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
         }
     }
-
+    
+    /*
+      // 或者 "scripts/script.json" 取决于打包时的相对路径
+    if (!ResourceManager::instance().loadTextFile(jsonPath).isEmpty()) {
+        if (m_engine->loadFromJsonFile(jsonPath)) {
+            m_engine->start();
+        }
+        else {
+            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
+        }
+    }
+    else {
+        // 如果明文测试时还是想选文件，可以保留
+        jsonPath = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
+        if (!jsonPath.isEmpty() && m_engine->loadFromJsonFile(jsonPath)) {
+            m_engine->start();
+        }
+        else {
+            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
+        }
+    }
+    */
     // menu actions
     auto* saveAct = menuBar()->addAction("Save");  
     connect(saveAct, &QAction::triggered, this, [this]() {
@@ -134,13 +162,8 @@ void MainWindow::keyPressEvent(QKeyEvent* ev) {
 
 void MainWindow::onBackgroundChanged(const QString& path) {
     auto& rm = ResourceManager::instance();
-    QPixmap px;
-    if (rm.hasPixmap(path)) {
-        px = rm.getPixmap(path);
-    }
-    else {
-        px = QPixmap(path);
-    }
+    QPixmap px = rm.getPixmap(path);
+
     if (px.isNull()) return;
 
     m_bgPixmap = px;
@@ -173,21 +196,13 @@ void MainWindow::onBackgroundChanged(const QString& path) {
 
 void MainWindow::onSpriteChanged(const QString& slot, const QString& path) {
     auto& rm = ResourceManager::instance();
-    if (rm.hasPixmap(path)) {
-        m_layer->setSprite(slot, rm.getPixmap(path));
-        return;
-    }
-    QPixmap px(path);
+    QPixmap px = rm.getPixmap(path);
     if (!px.isNull()) m_layer->setSprite(slot, px);
 }
 
 void MainWindow::onSpriteChangedTop(const QString& slot, const QString& path) {
     auto& rm = ResourceManager::instance();
-    if (rm.hasPixmap(path)) {
-        m_layerT->setSpriteTop(slot, rm.getPixmap(path));
-        return;
-    }
-    QPixmap px(path);
+    QPixmap px = rm.getPixmap(path);
     if (!px.isNull()) m_layerT->setSpriteTop(slot, px);
 }
 

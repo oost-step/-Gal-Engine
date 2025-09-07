@@ -8,7 +8,7 @@
       "lines": [
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "speaker": " ",
@@ -150,7 +150,7 @@
           "speaker": "结",
           "text": "哥哥大懒虫。而且，头发也乱糟糟的。",
           "sprite": "assets/ch/yui_angry.png",
-          "slot": "left",
+          "slot": "center",
           "psprite": "assets/ch/yui_profile.png",
           "pslot": "pleft"
         },
@@ -168,7 +168,7 @@
         },
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "cmd": "bg",
@@ -198,7 +198,7 @@
           "speaker": "结",
           "text": "又有人失踪了吗？最近这种事发生得也太多了。",
           "sprite": "assets/ch/yui_common.png",
-          "slot": "left",
+          "slot": "center",
           "psprite": "assets/ch/yui_profile.png",
           "pslot": "pleft"
         },
@@ -230,7 +230,7 @@
           "speaker": "结",
           "text": "哥哥怎么这样。那，假如我失踪了，哥哥也会觉得“还好”吗？",
           "sprite": "assets/ch/yui_angry.png",
-          "slot": "left",
+          "slot": "center",
           "psprite": "assets/ch/yui_profile.png",
           "pslot": "pleft"
         },
@@ -248,7 +248,7 @@
         },
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "speaker": " ",
@@ -319,10 +319,11 @@
     {
       "id": "waytoschool",
       "background": "assets/bg/street.png",
+      "music": "assets/bgm/Sunlight Summer.mp3",
       "lines": [
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "speaker": " ",
@@ -386,7 +387,7 @@
           "speaker": " ",
           "text": "全身上下都在因为撞击而作痛。我抬起眼睛，发现骑自行车的女生穿着和我一样的校服，应该是同校同学。",
           "sprite": "assets/ch/taki_common.png",
-          "slot": "left"
+          "slot": "center"
         },
         {
           "speaker": " ",
@@ -422,7 +423,7 @@
           "speaker": "? ? ?",
           "text": "我该不会记错时间了吧？完蛋了！",
           "sprite": "assets/ch/taki_shock.png",
-          "slot": "left",
+          "slot": "center",
           "psprite": "assets/ch/taki_profile.png",
           "pslot": "pleft"
         },
@@ -438,7 +439,7 @@
           "speaker": " ",
           "text": "但下一刻，她似乎终于意识到我还倒在地上，冲我伸出右手。",
           "sprite": "assets/ch/taki_shy.png",
-          "slot": "left"
+          "slot": "center"
         },
         {
           "speaker": "? ? ?",
@@ -456,7 +457,7 @@
         },
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "speaker": " ",
@@ -474,206 +475,135 @@
           "speaker": " ",
           "text": "话说，我身体上的疼痛似乎不见了。好得真快。"
         },
-
         {
           "speaker": " ",
-          "text": "加速脚步，紧赶慢赶，我还是没能在早读开始前冲过学校门口。不过值得庆幸的是，班上正传来一阵喧哗。"
-        },
-
-
-
-
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_throw.png" }
-        },
-        {
-          "speaker": " ",
-          "text": "在那之后，是一段幸福的时光......"
-        },
-        {
-          "speaker": " ",
-          "text": "可是"
-        },
-        {
-          "speaker": " ",
-          "text": "可是，我却回想不起她的声音"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
+          "text": "加速脚步，紧赶慢赶，我还是没能在早读开始前冲过学校门口。"
         },
         {
           "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_cry.png" }
-        },
-        {
-          "speaker": "???",
-          "text": "......"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_fade.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "1800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/white.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
+          "args": { "path": "assets/bg/classroom.png" }
         },
         {
           "speaker": " ",
-          "text": "！！！"
+          "text": "不过值得庆幸的是，班上正传来一阵喧哗。"
         },
         {
           "speaker": " ",
-          "text": "啊"
+          "text": "显然，班级里没有老师，早读也没有真正意义上地开始。"
         },
         {
           "speaker": " ",
-          "text": "是这样啊......"
+          "text": "我趁着老班还没来，窜到自己位置上正襟危坐，假装自己早已到班，并且做好了早读的准备。"
         },
         {
           "speaker": " ",
-          "text": "已经，来不及了......"
+          "text": "坐在我前座的男生转过头来，冲我一挑眼："
+        },
+        {
+          "speaker": "路人甲",
+          "text": "哟，这不是我们的妹控仁大人吗？你不是说你卡哇伊的妹妹每天早上都会叫你起来吗？今天怎么迟到了？"
+        },
+        {
+          "speaker": "仁",
+          "text": "结又不是机器，偶尔迟一点难道是很奇怪的事吗？"
+        },
+        {
+          "speaker": " ",
+          "text": "我不以为意地回答。"
+        },
+        {
+          "speaker": " ",
+          "text": "比起这个，我更关心为什么班主任还没来。往常他最喜欢做的事，就是在响铃的时候站在班级门口，逮住那些踩铃到班的同学，然后让他们站到讲台上去。"
+        },
+        {
+          "speaker": " ",
+          "text": "今天怎么回事？班上同学都已经到齐了，老班还没露面，那我缺的领读这一块谁给我补啊？"
+        },
+        {
+          "speaker": " ",
+          "text": "正想着，老班终于姗姗来迟，猛然推开门，吓得全班一下子安静下来。他环顾四周，确认班上人都到齐之后，满意地点点头，随后他走上讲台，冲门外招招手。"
+        },
+        {
+          "speaker": "老班",
+          "text": "今天，我们班上有一位新的转学生，她将加入我们这个大家庭，你们要好好和她相处。泷，上来做个自我介绍吧。"
+        },
+        {
+          "speaker": " ",
+          "text": "从门外走进一个女生，准确来说，是一个很可爱的女生。班上的男生们不由得鼓起掌来，我的同桌还兴奋地不停用手肘顶我，示意我好好欣赏一下这位转学生的风采。"
+        },
+        {
+          "speaker": " ",
+          "text": "我抬眼望去，旋即瞪大了双眼——正如世间一切俗套故事所记载的那样——站在讲台上的，赫然是早晨撞上我的那位少女。",
+          "sprite": "assets/ch/taki_smile.png",
+          "slot": "center"
+        },
+        {
+          "speaker": " ",
+          "text": "既然如此，这件事还不如迟到没被老班抓到值得令我高兴。"
+        },
+        {
+          "cmd": "clear",
+          "args": { "slot": "center" }
+        },
+        {
+          "speaker": "老班",
+          "text": "对了，我刚才看见仁同学早读铃响后还在校园里奔跑。今天的领读就由他来吧。"
+        },
+        {
+          "speaker": " ",
+          "text": "可恶。"
         },
         {
           "cmd": "goto",
-          "args": { "scene": "second" }
+          "args": { "scene": "lunch" }
         }
       ]
     },
     {
-      "id": "first",
-      "background": "assets/bg/evening.jpg",
+      "id": "lunch",
       "lines": [
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "speaker": " ",
-          "text": "她躺在废品回收站里。"
+          "text": "（上课下课）"
         },
         {
           "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_throw.png" }
+          "args": { "path": "assets/bg/restaurant.png" }
         },
         {
           "speaker": " ",
-          "text": "在那之后，是一段幸福的时光......"
+          "text": "先后经过数学、物理、化学、语文的摧残，总算到了午饭时间。"
         },
         {
           "speaker": " ",
-          "text": "可是"
+          "text": "今天中午吃点什么好捏？我带着愉悦的心情，在食堂里挑选饭菜。"
         },
         {
           "speaker": " ",
-          "text": "可是，我却回想不起她的声音"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_cry.png" }
-        },
-        {
-          "speaker": "???",
-          "text": "......"
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/lucy_fade.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "1800" }
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/white.png" }
-        },
-        {
-          "cmd": "wait",
-          "args": { "ms": "500" }
+          "text": "说是这么说，其实可供挑选的只有十多种，其中还有不少水煮西芹这种让人连看它一眼的食欲都没有的菜品。"
         },
         {
           "speaker": " ",
-          "text": "！！！"
+          "text": "也难怪不少同学都是让家里人做好饭，带到学校来吃。"
         },
         {
           "speaker": " ",
-          "text": "啊"
+          "text": "不过，托这些人的福，即使是刚下课的时候，食堂也并不拥挤。"
         },
         {
           "speaker": " ",
-          "text": "是这样啊......"
+          "text": "排队不超过五分钟，我就将西红柿炒蛋、小白菜以及荔枝肉作为今天中午的签约选手，再加上米饭和例汤，形成一个四保一战术。"
         },
+
+
+
+
         {
-          "speaker": " ",
-          "text": "已经，来不及了......"
-        },
-        {
-          "cmd": "goto",
-          "args": { "scene": "second" }
-        }
-      ]
-    },
-    {
-      "id": "second",
-      "background": "assets/bg/black.png",
-      "lines": [
-        {
-          "cmd": "clear",
-          "args": { "slot": "left" }
-        },
-        {
-          "speaker": " ",
-          "text": "屋子里很暗"
-        },
-        {
-          "speaker": " ",
-          "text": "可是我很清楚"
-        },
-        {
-          "speaker": " ",
-          "text": "她就在那里，坐在地上"
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/yuki_dead.jpg" }
-        },
-        {
-          "speaker": "？？？",
-          "text": "还是没赶上吗"
-        },
-        {
-          "speaker": "？？？",
-          "text": "没办法了"
-        },
-        {
-          "cmd": "bg",
-          "args": { "path": "assets/bg/black.png" }
-        },
-        {
-          "cmd": "goto",
-          "args": { "scene": "choices" }
+          "cmd": "end"
         }
       ]
     },
@@ -685,7 +615,7 @@
           "speaker": "？？？",
           "text": "屏幕那一边的人啊",
           "sprite": "assets/ch/sophi.png",
-          "slot": "left"
+          "slot": "center"
         },
         {
           "speaker": "？？？",
@@ -705,7 +635,7 @@
         },
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "choice": {
@@ -739,7 +669,7 @@
       "lines": [
         {
           "cmd": "clear",
-          "args": { "slot": "left" }
+          "args": { "slot": "center" }
         },
         {
           "cmd": "wait",
@@ -753,7 +683,7 @@
           "speaker": "有希",
           "text": "嘿！你在发什么呆呢！快过来！",
           "sprite": "assets/ch/nagato.png",
-          "slot": "left",
+          "slot": "center",
           "psprite": "assets/ch/nagato_profile.png",
           "pslot": "pleft"
         },
