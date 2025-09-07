@@ -8,13 +8,14 @@ ImageLayer::ImageLayer(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
+    m_lleft = new QLabel(this);
     m_left = new QLabel(this);
     m_right = new QLabel(this);
     m_pleft = new QLabel(this);
     m_pcenter = new QLabel(this);
     m_pright = new QLabel(this);
 
-    for (auto* l : { m_left, m_right, m_pleft, m_pcenter, m_pright }) {
+    for (auto* l : { m_lleft, m_left, m_right, m_pleft, m_pcenter, m_pright }) {
         l->setScaledContents(false);
         l->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         l->hide();
@@ -23,7 +24,8 @@ ImageLayer::ImageLayer(QWidget* parent) : QWidget(parent) {
 }
 
 QLabel* ImageLayer::pick(const QString& slot) {
-    if (slot.compare("left", Qt::CaseInsensitive) == 0) return m_left;
+    if (slot.compare("left", Qt::CaseInsensitive) == 0) return m_lleft;
+    if (slot.compare("center", Qt::CaseInsensitive) == 0) return m_left;
     if (slot.compare("right", Qt::CaseInsensitive) == 0) return m_right;
     if (slot.compare("pleft", Qt::CaseInsensitive) == 0) return m_pleft;
     if (slot.compare("pright", Qt::CaseInsensitive) == 0) return m_pright;
@@ -128,7 +130,7 @@ void ImageLayer::clearSprite(const QString& slot, int fadeOutDuration)
 }
 
 void ImageLayer::clearAll() {
-    for (auto* l : { m_left, m_right, m_pleft, m_pcenter, m_pright }) { l->clear(); l->hide(); }
+    for (auto* l : { m_lleft, m_left, m_right, m_pleft, m_pcenter, m_pright }) { l->clear(); l->hide(); }
 }
 
 void ImageLayer::resizeEvent(QResizeEvent* ev) {
@@ -141,6 +143,7 @@ void ImageLayer::layoutSprites() {
     const int h = height();
     const int baseW = w / 3;
     const int baseH = h;
+    m_lleft->setGeometry(260, 0, 510, 720);
     m_left->setGeometry(640 - 255, 0, 510, 720);
     //m_center->setGeometry((w - baseW) / 2, h - baseH, baseW, baseH);
     m_right->setGeometry(260 + 510, 0, 510, 720);
@@ -155,13 +158,14 @@ ImageLayerTop::ImageLayerTop(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
+    m_lleft = new QLabel(this);
     m_left = new QLabel(this);
     m_right = new QLabel(this);
     m_pleft = new QLabel(this);
     m_pcenter = new QLabel(this);
     m_pright = new QLabel(this);
 
-    for (auto* l : { m_left, m_right, m_pleft, m_pcenter, m_pright }) {
+    for (auto* l : { m_lleft, m_left, m_right, m_pleft, m_pcenter, m_pright }) {
         l->setScaledContents(false);
         l->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         l->hide();
@@ -170,7 +174,8 @@ ImageLayerTop::ImageLayerTop(QWidget* parent) : QWidget(parent) {
 }
 
 QLabel* ImageLayerTop::pick(const QString& slot) {
-    if (slot.compare("left", Qt::CaseInsensitive) == 0) return m_left;
+    if (slot.compare("left", Qt::CaseInsensitive) == 0) return m_lleft;
+    if (slot.compare("center", Qt::CaseInsensitive) == 0) return m_left;
     if (slot.compare("right", Qt::CaseInsensitive) == 0) return m_right;
     if (slot.compare("pleft", Qt::CaseInsensitive) == 0) return m_pleft;
     if (slot.compare("pright", Qt::CaseInsensitive) == 0) return m_pright;
@@ -197,7 +202,7 @@ void ImageLayerTop::clearSpriteTop(const QString& slot) {
 }
 
 void ImageLayerTop::clearAllTop() {
-    for (auto* l : { m_left, m_right, m_pleft, m_pcenter, m_pright }) { l->clear(); l->hide(); }
+    for (auto* l : { m_lleft, m_left, m_right, m_pleft, m_pcenter, m_pright }) { l->clear(); l->hide(); }
 }
 
 void ImageLayerTop::resizeEvent(QResizeEvent* ev) {
@@ -210,6 +215,7 @@ void ImageLayerTop::layoutSprites() {
     const int h = height();
     const int baseW = w / 3;
     const int baseH = h;
+    m_left->setGeometry(260, 0, 510, 720);
     m_left->setGeometry(640 - 255, 0, 510, 720);
     //m_center->setGeometry((w - baseW) / 2, h - baseH, baseW, baseH);
     m_right->setGeometry(260 + 510, 0, 510, 720);

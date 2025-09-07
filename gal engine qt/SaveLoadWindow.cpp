@@ -21,8 +21,8 @@ SaveLoadWindow::SaveLoadWindow(ScriptEngine* engine, Mode mode, QWidget* parent)
     QGridLayout* grid = new QGridLayout();
     for (int i = 0; i < m_slotsPerPage; i++) {
         QPushButton* btn = new QPushButton(this);
-        btn->setFixedSize(220, 120);
-        btn->setStyleSheet("QPushButton { text-align: left; }");
+        //btn->setFixedSize(220, 120);
+        //btn->setStyleSheet("QPushButton { text-align: left; }");
         connect(btn, &QPushButton::clicked, this, [this, i]() { onSlotClicked(i); });
         grid->addWidget(btn, i / 3, i % 3);
         m_slotButtons.append(btn);
@@ -55,7 +55,7 @@ SaveLoadWindow::SaveLoadWindow(ScriptEngine* engine, Mode mode, QWidget* parent)
 void SaveLoadWindow::loadSlots() {
     m_slots.clear();
     for (int i = 0; i < m_totalSlots; i++) {
-        QString filename = QString("save_slot_%1.json").arg(i);
+        QString filename = QString("saves/save_slot_%1.json").arg(i);
         SaveSlotInfo info;
         info.file = filename;
 
@@ -81,6 +81,9 @@ void SaveLoadWindow::refreshUi() {
         int idx = start + i;
         QPushButton* btn = m_slotButtons[i];
         if (idx >= m_slots.size()) {
+            btn->setStyleSheet("QPushButton { "
+                "font-size: 7pt; "
+                "}");
             btn->setText("Empty");
             btn->setIcon(QIcon());
             continue;
@@ -103,6 +106,9 @@ void SaveLoadWindow::refreshUi() {
             }
         }
         else {
+            btn->setStyleSheet("QPushButton { "
+                "font-size: 7pt; "
+                "}");
             btn->setText(QString("Slot %1\n(Empty)").arg(idx));
             btn->setIcon(QIcon());
         }

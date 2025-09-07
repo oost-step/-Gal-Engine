@@ -104,9 +104,9 @@ void ScriptEngine::advance() {
         return;
     }
     if (!ln.spritePath.isEmpty()) {
-        QString slot = ln.spriteSlot.isEmpty() ? "left" : ln.spriteSlot;
+        QString slot = ln.spriteSlot.isEmpty() ? "center" : ln.spriteSlot;
         m_currentSprites[slot] = ln.spritePath;
-        emit spriteChanged(ln.spriteSlot.isEmpty() ? "left" : ln.spriteSlot, ln.spritePath);
+        emit spriteChanged(ln.spriteSlot.isEmpty() ? "center" : ln.spriteSlot, ln.spritePath);
     }
     if (!ln.profilePath.isEmpty()) {
         QString sslot = ln.profileSlot.isEmpty() ? "pleft" : ln.profileSlot;
@@ -169,11 +169,17 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
         QTimer::singleShot(ms, this, &ScriptEngine::advance);
         emit waitRequested(ms);
     }
+    else if (c == "ch") {
+        const QString path = ln.args.value("path").toString();
+        const QString slot = ln.args.value("slot").toString();
+        m_currentSprites[slot] = path;
+        emit spriteChanged(slot.isEmpty() ? "center" : slot, path);
+    }
     else if (c == "clear") {
         const QString slot = ln.args.value("slot").toString();
         if (slot.isEmpty()) {
             QStringList slotList;
-            slotList << "left" << "right" << "pleft" << "pcenter" << "pright";
+            slotList << "center" << "left" << "right" << "pleft" << "pcenter" << "pright";
 
             for (int i = 0; i < slotList.size(); ++i) {
                 const QString s = slotList.at(i);

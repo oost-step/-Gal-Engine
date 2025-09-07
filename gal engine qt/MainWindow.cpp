@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(m_dialogue, &DialogueBox::clicked, m_engine, &ScriptEngine::advance);
     connect(m_choices, &ChoiceOverlay::choiceSelected, m_engine, &ScriptEngine::onChoiceSelected);
 
+    connect(this, &MainWindow::playSound, m_audio, &AudioManager::playSe);
+
     layoutUi();
 
     // Load script
@@ -74,16 +76,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     }
 
     // menu actions
-    auto* saveAct = menuBar()->addAction("Save");
+    auto* saveAct = menuBar()->addAction("Save");  
     connect(saveAct, &QAction::triggered, this, [this]() {
+        emit playSound("resources/save.mp3");
         SaveLoadWindow dlg(m_engine, SaveLoadWindow::SaveMode, this);
         connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
         connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
         dlg.exec();
     });
 
-    auto* loadAct = menuBar()->addAction("Load");
+    auto* loadAct = menuBar()->addAction("Load");  
     connect(loadAct, &QAction::triggered, this, [this]() {
+        emit playSound("resources/load.mp3");
         SaveLoadWindow dlg(m_engine, SaveLoadWindow::LoadMode, this);
         connect(&dlg, &SaveLoadWindow::saveToSlot, this, &MainWindow::saveToSlot);
         connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
@@ -275,9 +279,11 @@ void MainWindow::showHistory() {
 void MainWindow::saveToSlot(int slotIndex) {
     if (!m_engine) return;
 
+    QDir().mkpath("saves");
+
     // 1. 截取当前窗口为缩略图
     QPixmap screenshot = this->grab();
-    QString screenshotPath = QString("save_slot_%1.png").arg(slotIndex);
+    QString screenshotPath = QString("saves/save_slot_%1.png").arg(slotIndex);
     screenshot = screenshot.scaled(320, 180, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     screenshot.save(screenshotPath, "PNG");
 
@@ -289,7 +295,7 @@ void MainWindow::saveToSlot(int slotIndex) {
     }
 
     // 3. 调用 ScriptEngine 保存
-    QString jsonFile = QString("save_slot_%1.json").arg(slotIndex);
+    QString jsonFile = QString("saves/save_slot_%1.json").arg(slotIndex);
     m_engine->saveSnapshotWithMeta(jsonFile, screenshotPath, desc);
 
     // 4. 提示用户
@@ -299,7 +305,7 @@ void MainWindow::saveToSlot(int slotIndex) {
 void MainWindow::loadFromSlot(int slotIndex) {
     if (!m_engine) return;
 
-    QString jsonFile = QString("save_slot_%1.json").arg(slotIndex);
+    QString jsonFile = QString("saves/save_slot_%1.json").arg(slotIndex);
     if (!QFile::exists(jsonFile)) {
         //statusBar()->showMessage(QString("Slot %1 is empty").arg(slotIndex), 3000);
         return;

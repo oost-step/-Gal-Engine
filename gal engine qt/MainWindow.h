@@ -37,6 +37,9 @@ private slots:
 
     void onReturnClicked();
 
+signals:
+    void playSound(const QString& path);
+
 private:
     QLabel* m_bg;
     ImageLayer* m_layer;

@@ -21,6 +21,7 @@ private:
     QMap<QLabel*, QPropertyAnimation*> m_animations;
     int m_defaultFadeDuration = 1000;
 
+    QLabel* m_lleft;
     QLabel* m_left;
     QLabel* m_right;
     QLabel* m_pleft;
@@ -43,6 +44,7 @@ private:
     QLabel* pick(const QString& slot);
     void layoutSprites();
 
+    QLabel* m_lleft;
     QLabel* m_left;
     QLabel* m_right;
     QLabel* m_pleft;
