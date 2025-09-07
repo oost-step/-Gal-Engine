@@ -1,10 +1,14 @@
+// StartWindow.cpp
 #include "StartWindow.h"
 #include "SettingWindow.h"
 #include "GalleryWindow.h"
+#include "MainWindow.h"
+#include "ResourceManager.h"
+#include "AudioManager.h"
 #include <QVBoxLayout>
 #include <QFile>
 #include <QApplication>
-#include <qpushbutton.h>
+#include <QPushButton>
 #include <QString>
 #include <QPainter>
 #include <QHBoxLayout>
@@ -13,7 +17,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QMediaPlayer>
 #include <QAudioOutput>
-#include "MainWindow.h"
+#include <QDebug>
 
 // 配置变量
 const QString BACKGROUND_IMAGE_PATH = "resources/background.jpg"; // 底图文件路径
@@ -24,24 +28,41 @@ const int BUTTON_HEIGHT = 60; // 按钮高度
 const int RIGHT_MARGIN = 20; // 右侧边距
 const int BOTTOM_MARGIN = 0; // 底部边距
 
+// 音频文件路径
+const QString BGM_PATH = "resources/little explorer.mp3";
+const QString START_SOUND_PATH = "resources/start.mp3";
+const QString CONTINUE_SOUND_PATH = "resources/Continue.mp3";
+const QString GALLERY_SOUND_PATH = "resources/gallery.mp3";
+const QString SETTING_SOUND_PATH = "resources/setting.mp3";
+const QString EXIT_SOUND_PATH = "resources/exit.mp3";
+
 StartWindow::StartWindow(QWidget* parent) : QWidget(parent)
 {
     setWindowTitle("GalEngine - Start");
     setFixedSize(1280, 720);
 
-    mm_bgm = new QMediaPlayer(this);
-    mm_bgmOut = new QAudioOutput(this);
-    mm_bgm->setAudioOutput(mm_bgmOut);
-    mm_bgmOut->setVolume(0.5f);
+    // 创建音频管理器
+    m_audioManager = new AudioManager(this);
 
-    mm_se = new QMediaPlayer(this);
-    mm_seOut = new QAudioOutput(this);
-    mm_se->setAudioOutput(mm_seOut);
-    mm_seOut->setVolume(1.0f);
+    // 预加载图片资源
+    ResourceManager::instance().preloadImage(BACKGROUND_IMAGE_PATH);
+    ResourceManager::instance().preloadImage(LOGO_IMAGE_PATH);
 
-    mm_bgm->setSource(QUrl::fromLocalFile("resources/little explorer.mp3"));
-    mm_bgm->setLoops(QMediaPlayer::Infinite);
-    mm_bgm->play();
+    // 注册音频资源
+    ResourceManager::instance().registerAudio(BGM_PATH);
+    ResourceManager::instance().registerAudio(START_SOUND_PATH);
+    ResourceManager::instance().registerAudio(CONTINUE_SOUND_PATH);
+    ResourceManager::instance().registerAudio(GALLERY_SOUND_PATH);
+    ResourceManager::instance().registerAudio(SETTING_SOUND_PATH);
+    ResourceManager::instance().registerAudio(EXIT_SOUND_PATH);
+
+    // 播放背景音乐
+    if (ResourceManager::instance().hasAudio(BGM_PATH)) {
+        m_audioManager->playBgm(BGM_PATH);
+    }
+    else {
+        qDebug() << "BGM file not found:" << BGM_PATH;
+    }
 
     // 设置样式表用于按钮悬停效果
     setStyleSheet(R"(
@@ -120,10 +141,12 @@ StartWindow::StartWindow(QWidget* parent) : QWidget(parent)
     connect(settingBtn, &QPushButton::clicked, this, &StartWindow::onSettingGame);
     connect(exitBtn, &QPushButton::clicked, this, &StartWindow::onExitGame);
 
-    // 加载logo图片
-    logoPixmap.load(LOGO_IMAGE_PATH);
+    // 从 ResourceManager 获取 logo 图片
+    logoPixmap = ResourceManager::instance().getPixmap(LOGO_IMAGE_PATH);
     if (logoPixmap.isNull()) {
         qDebug() << "Failed to load logo image:" << LOGO_IMAGE_PATH;
+        // 尝试直接加载
+        logoPixmap.load(LOGO_IMAGE_PATH);
     }
 }
 
@@ -139,8 +162,13 @@ void StartWindow::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
 
-    // 绘制背景图
-    QPixmap background(BACKGROUND_IMAGE_PATH);
+    // 从 ResourceManager 获取背景图片
+    QPixmap background = ResourceManager::instance().getPixmap(BACKGROUND_IMAGE_PATH);
+    if (background.isNull()) {
+        // 如果从ResourceManager获取失败，尝试直接加载
+        background.load(BACKGROUND_IMAGE_PATH);
+    }
+
     if (!background.isNull()) {
         // 缩放背景图以填充整个窗口
         painter.drawPixmap(0, 0, width(), height(), background);
@@ -168,110 +196,115 @@ void StartWindow::paintEvent(QPaintEvent* event)
 
 void StartWindow::onStartGame()
 {
-    mm_bgm->stop();
-    mm_se->setSource(QUrl::fromLocalFile("resources/start.mp3"));
-    mm_se->setLoops(1);
+    m_audioManager->stopBgm();
 
-    // 连接媒体播放结束的信号
-    connect(mm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia) {
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(START_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(START_SOUND_PATH, [this]() {
             if (!m_mainWindow) {
                 m_mainWindow = new MainWindow();
             }
             m_mainWindow->show();
             this->close();
-
-            // 断开连接
-            disconnect(mm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
+        });
+    }
+    else {
+        qDebug() << "Start sound file not found:" << START_SOUND_PATH;
+        // 即使没有音效也继续执行
+        if (!m_mainWindow) {
+            m_mainWindow = new MainWindow();
         }
-    });
-
-    mm_se->play();
+        m_mainWindow->show();
+        this->close();
+    }
 }
 
 void StartWindow::onContinueGame()
 {
-    mm_bgm->stop();
-    mm_se->setSource(QUrl::fromLocalFile("resources/Continue.mp3"));
-    mm_se->setLoops(1);
+    m_audioManager->stopBgm();
 
-    // 连接媒体播放结束的信号
-    connect(mm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia) {
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(CONTINUE_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(CONTINUE_SOUND_PATH, [this]() {
             if (!m_mainWindow)
                 m_mainWindow = new MainWindow();
-            
+
             m_mainWindow->startWindowContinue();
             m_mainWindow->show();
             this->close();
+        });
+    }
+    else {
+        qDebug() << "Continue sound file not found:" << CONTINUE_SOUND_PATH;
+        // 即使没有音效也继续执行
+        if (!m_mainWindow)
+            m_mainWindow = new MainWindow();
 
-            // 断开连接
-            disconnect(mm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
-        }
-    });
-
-    mm_se->play();
+        m_mainWindow->startWindowContinue();
+        m_mainWindow->show();
+        this->close();
+    }
 }
 
 void StartWindow::onGalleryGame()
 {
-    mm_bgm->stop();
-    mm_se->setSource(QUrl::fromLocalFile("resources/gallery.mp3"));
-    mm_se->setLoops(1);
+    m_audioManager->stopBgm();
 
-    // 连接媒体播放结束的信号
-    connect(mm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia) {
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(GALLERY_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(GALLERY_SOUND_PATH, [this]() {
             if (!m_galleryWindow)
                 m_galleryWindow = new GalleryWindow();
             m_galleryWindow->show();
             this->close();
-
-            // 断开连接
-            disconnect(mm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
-        }
-    });
-
-    mm_se->play();
+        });
+    }
+    else {
+        qDebug() << "Gallery sound file not found:" << GALLERY_SOUND_PATH;
+        // 即使没有音效也继续执行
+        if (!m_galleryWindow)
+            m_galleryWindow = new GalleryWindow();
+        m_galleryWindow->show();
+        this->close();
+    }
 }
 
 void StartWindow::onSettingGame()
 {
-    mm_bgm->stop();
-    mm_se->setSource(QUrl::fromLocalFile("resources/setting.mp3"));
-    mm_se->setLoops(1);
+    m_audioManager->stopBgm();
 
-    // 连接媒体播放结束的信号
-    connect(mm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia) {
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(SETTING_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(SETTING_SOUND_PATH, [this]() {
             if (!m_settingWindow)
                 m_settingWindow = new SettingWindow();
             m_settingWindow->show();
             this->close();
-
-            // 断开连接
-            disconnect(mm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
-        }
-    });
-
-    mm_se->play();
+        });
+    }
+    else {
+        qDebug() << "Setting sound file not found:" << SETTING_SOUND_PATH;
+        // 即使没有音效也继续执行
+        if (!m_settingWindow)
+            m_settingWindow = new SettingWindow();
+        m_settingWindow->show();
+        this->close();
+    }
 }
 
 void StartWindow::onExitGame()
 {
-    mm_bgm->stop();
-    mm_se->setSource(QUrl::fromLocalFile("resources/exit.mp3"));
-    mm_se->setLoops(1);
+    m_audioManager->stopBgm();
 
-    // 连接媒体播放结束的信号
-    connect(mm_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia) {
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(EXIT_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(EXIT_SOUND_PATH, [this]() {
             QApplication::quit();
-
-            // 断开连接
-            disconnect(mm_se, &QMediaPlayer::mediaStatusChanged, this, nullptr);
-        }
-    });
-
-    mm_se->play();
+        });
+    }
+    else {
+        qDebug() << "Exit sound file not found:" << EXIT_SOUND_PATH;
+        // 即使没有音效也退出
+        QApplication::quit();
+    }
 }

@@ -10,6 +10,7 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 #include <QPointer>
+#include "AudioManager.h"
 
 class QMediaPlayer;
 class QAudioOutput;
@@ -55,6 +56,8 @@ private:
     QPushButton* nextBtn;
     QPushButton* musicBtn;
     StartWindow* m_startWindow = nullptr;
+
+    AudioManager* m_audioManager = nullptr;
 
     QScrollArea* previewArea;
     QWidget* previewWidget;

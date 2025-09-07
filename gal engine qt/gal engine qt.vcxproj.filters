@@ -61,9 +61,6 @@
     <ClCompile Include="ScriptEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StartWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SettingWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -71,6 +68,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SaveLoadWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StartWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,9 +101,6 @@
     <QtMoc Include="ScriptEngine.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="StartWindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="OutlineTextBrowser.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -122,9 +119,13 @@
     <QtMoc Include="SaveLoadWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="StartWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <None Include="script.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Read me.txt" />

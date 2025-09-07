@@ -1,9 +1,11 @@
-#include "StartWindow.h"
 #include "SettingWindow.h"
+#include "StartWindow.h"
+#include "ResourceManager.h"
+#include "AudioManager.h"
 #include <QVBoxLayout>
 #include <QFile>
 #include <QApplication>
-#include <qpushbutton.h>
+#include <QPushButton>
 #include <QString>
 #include <QPainter>
 #include <QHBoxLayout>
@@ -12,7 +14,8 @@
 #include <QGraphicsOpacityEffect>
 #include <QMediaPlayer>
 #include <QAudioOutput>
-#include <Qurl>
+#include <QUrl>
+#include <QDebug>
 
 // 配置变量
 const QString BACKGROUND_IMAGE_PATH = "resources/background.jpg"; // 底图文件路径
@@ -23,24 +26,33 @@ const int BUTTON_HEIGHT = 60; // 按钮高度
 const int RIGHT_MARGIN = 20; // 右侧边距
 const int BOTTOM_MARGIN = 0; // 底部边距
 
+// 音频文件路径
+const QString SETTING_BGM_PATH = "resources/Perple Moon.mp3";
+const QString RETURN_SOUND_PATH = "";
+
 SettingWindow::SettingWindow(QWidget* parent) : QWidget(parent)
 {
     setWindowTitle("GalEngine - Setting");
     setFixedSize(1280, 720);
 
-    mm_bgm = new QMediaPlayer(this);
-    mm_bgmOut = new QAudioOutput(this);
-    mm_bgm->setAudioOutput(mm_bgmOut);
-    mm_bgmOut->setVolume(0.5f);
+    // 创建音频管理器
+    m_audioManager = new AudioManager(this);
 
-    mm_se = new QMediaPlayer(this);
-    mm_seOut = new QAudioOutput(this);
-    mm_se->setAudioOutput(mm_seOut);
-    mm_seOut->setVolume(1.0f);
+    // 预加载图片资源
+    ResourceManager::instance().preloadImage(BACKGROUND_IMAGE_PATH);
+    ResourceManager::instance().preloadImage(LOGO_IMAGE_PATH);
 
-    mm_bgm->setSource(QUrl::fromLocalFile("resources/Perple Moon.mp3"));
-    mm_bgm->setLoops(QMediaPlayer::Infinite);
-    mm_bgm->play();
+    // 注册音频资源
+    ResourceManager::instance().registerAudio(SETTING_BGM_PATH);
+    ResourceManager::instance().registerAudio(RETURN_SOUND_PATH);
+
+    // 播放背景音乐
+    if (ResourceManager::instance().hasAudio(SETTING_BGM_PATH)) {
+        m_audioManager->playBgm(SETTING_BGM_PATH);
+    }
+    else {
+        qDebug() << "Setting BGM file not found:" << SETTING_BGM_PATH;
+    }
 
     // 设置样式表用于按钮悬停效果
     setStyleSheet(R"(
@@ -86,14 +98,11 @@ SettingWindow::SettingWindow(QWidget* parent) : QWidget(parent)
 
     returnBtn = new QPushButton(QString::fromLocal8Bit("return"), this);
 
-
     // 设置按钮大小
     returnBtn->setFixedSize(BUTTON_WIDTH, BUTTON_HEIGHT);
 
-
     // 添加到右侧布局
     rightLayout->addWidget(returnBtn);
-
 
     // 在按钮上方添加弹性空间，使按钮垂直居中
     rightLayout->insertStretch(0, 1);
@@ -106,11 +115,12 @@ SettingWindow::SettingWindow(QWidget* parent) : QWidget(parent)
 
     connect(returnBtn, &QPushButton::clicked, this, &SettingWindow::onReturnGame);
 
-
-    // 加载logo图片
-    logoPixmap.load(LOGO_IMAGE_PATH);
+    // 从 ResourceManager 获取 logo 图片
+    logoPixmap = ResourceManager::instance().getPixmap(LOGO_IMAGE_PATH);
     if (logoPixmap.isNull()) {
         qDebug() << "Failed to load logo image:" << LOGO_IMAGE_PATH;
+        // 尝试直接加载
+        logoPixmap.load(LOGO_IMAGE_PATH);
     }
 }
 
@@ -126,8 +136,13 @@ void SettingWindow::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
 
-    // 绘制背景图
-    QPixmap background(BACKGROUND_IMAGE_PATH);
+    // 从 ResourceManager 获取背景图片
+    QPixmap background = ResourceManager::instance().getPixmap(BACKGROUND_IMAGE_PATH);
+    if (background.isNull()) {
+        // 如果从ResourceManager获取失败，尝试直接加载
+        background.load(BACKGROUND_IMAGE_PATH);
+    }
+
     if (!background.isNull()) {
         // 缩放背景图以填充整个窗口
         painter.drawPixmap(0, 0, width(), height(), background);
@@ -155,9 +170,23 @@ void SettingWindow::paintEvent(QPaintEvent* event)
 
 void SettingWindow::onReturnGame()
 {
-    mm_bgm->stop();
-    if (!m_startWindow)
-        m_startWindow = new StartWindow();
-    m_startWindow->show();
-    this->close();
+    m_audioManager->stopBgm();
+
+    // 使用 ResourceManager 检查音频是否存在
+    if (ResourceManager::instance().hasAudio(RETURN_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(RETURN_SOUND_PATH, [this]() {
+            if (!m_startWindow)
+                m_startWindow = new StartWindow();
+            m_startWindow->show();
+            this->close();
+        });
+    }
+    else {
+        qDebug() << "Return sound file not found:" << RETURN_SOUND_PATH;
+        // 即使没有音效也继续执行
+        if (!m_startWindow)
+            m_startWindow = new StartWindow();
+        m_startWindow->show();
+        this->close();
+    }
 }

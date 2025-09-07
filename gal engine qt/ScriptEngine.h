@@ -13,6 +13,7 @@ class ScriptEngine : public QObject {
 public:
     explicit ScriptEngine(QObject* parent = nullptr);
     bool loadFromJsonFile(const QString& path);
+    bool loadFromJsonObject(const QJsonObject& root);
     bool parse(const QJsonObject& root);
 
     void start(const QString& sceneId = QString());

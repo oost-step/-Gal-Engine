@@ -63,16 +63,25 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     layoutUi();
 
     // Load script
-    QString json = QDir::current().filePath("script.json");
-    if (!QFile::exists(json)) {
-        json = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
-    }
-    if (!json.isEmpty() && m_engine->loadFromJsonFile(json)) {
-        //statusBar()->showMessage("Loaded script: " + json);
-        m_engine->start();
+    QString jsonPath = QDir::current().filePath("script.json");
+    if (!ResourceManager::instance().loadTextFile(jsonPath).isEmpty()) {
+        if (m_engine->loadFromJsonFile(jsonPath)) {
+            //statusBar()->showMessage("Loaded script: " + jsonPath);
+            m_engine->start();
+        }
+        else {
+            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
+        }
     }
     else {
-        QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
+        jsonPath = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
+        if (!jsonPath.isEmpty() && m_engine->loadFromJsonFile(jsonPath)) {
+            //statusBar()->showMessage("Loaded script: " + jsonPath);
+            m_engine->start();
+        }
+        else {
+            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
+        }
     }
 
     // menu actions

@@ -1,21 +1,24 @@
+// StartWindow.h
+#ifndef STARTWINDOW_H
+#define STARTWINDOW_H
+
 #include <QWidget>
 #include <QPixmap>
-#include <QPointer>
-#include <QString>
 
-class QMediaPlayer;
-class QAudioOutput;
-class QLabel;
-class QPushButton;
 class MainWindow;
 class SettingWindow;
 class GalleryWindow;
+class AudioManager;
 
-class StartWindow : public QWidget {
+class StartWindow : public QWidget
+{
     Q_OBJECT
 public:
     explicit StartWindow(QWidget* parent = nullptr);
     ~StartWindow();
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
 
 private slots:
     void onStartGame();
@@ -25,22 +28,22 @@ private slots:
     void onExitGame();
 
 private:
-    void paintEvent(QPaintEvent* event);
+    QPixmap logoPixmap;
 
-    QPointer<QMediaPlayer> mm_bgm;
-    QPointer<QAudioOutput> mm_bgmOut;
-    QPointer<QMediaPlayer> mm_se;
-    QPointer<QAudioOutput> mm_seOut;
+    // UI elements
+    class QPushButton* startBtn;
+    class QPushButton* continueBtn;
+    class QPushButton* galleryBtn;
+    class QPushButton* settingBtn;
+    class QPushButton* exitBtn;
 
-    QLabel* logoLabel;
-    QPushButton* startBtn;
-    QPushButton* continueBtn;
-    QPushButton* galleryBtn;
-    QPushButton* settingBtn;
-    QPushButton* exitBtn;
+    // Windows
     MainWindow* m_mainWindow = nullptr;
     SettingWindow* m_settingWindow = nullptr;
     GalleryWindow* m_galleryWindow = nullptr;
 
-    QPixmap logoPixmap;
+    // Audio
+    AudioManager* m_audioManager = nullptr;
 };
+
+#endif // STARTWINDOW_H

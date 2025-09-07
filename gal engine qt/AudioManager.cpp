@@ -1,6 +1,5 @@
+// AudioManager.cpp
 #include "AudioManager.h"
-#include <QMediaPlayer>
-#include <QAudioOutput>
 #include <QUrl>
 #include <QDebug>
 
@@ -14,6 +13,19 @@ AudioManager::AudioManager(QObject* parent) : QObject(parent) {
     m_seOut = new QAudioOutput(this);
     m_se->setAudioOutput(m_seOut);
     m_seOut->setVolume(1.0f);
+
+    // 连接音效完成信号
+    connect(m_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
+        if (status == QMediaPlayer::EndOfMedia) {
+            emit seFinished();
+
+            // 执行所有回调函数
+            for (const auto& callback : m_seCallbacks) {
+                if (callback) callback();
+            }
+            m_seCallbacks.clear();
+        }
+    });
 }
 
 void AudioManager::setBgmVolume(float v) {
@@ -42,4 +54,21 @@ void AudioManager::playSe(const QString& file) {
     m_se->setSource(QUrl::fromLocalFile(file));
     m_se->setLoops(1);
     m_se->play();
+}
+
+void AudioManager::playSeWithCallback(const QString& file, std::function<void()> callback) {
+    if (file.isEmpty()) return;
+    if (m_se->playbackState() == QMediaPlayer::PlayingState) m_se->stop();
+
+    if (callback) {
+        m_seCallbacks.append(callback);
+    }
+
+    m_se->setSource(QUrl::fromLocalFile(file));
+    m_se->setLoops(1);
+    m_se->play();
+}
+
+void AudioManager::disconnectSeCallbacks() {
+    m_seCallbacks.clear();
 }

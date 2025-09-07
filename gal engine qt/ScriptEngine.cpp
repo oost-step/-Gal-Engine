@@ -1,5 +1,6 @@
 #include "ScriptEngine.h"
 #include "StartWindow.h"
+#include "ResourceManager.h"
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -13,11 +14,17 @@
 ScriptEngine::ScriptEngine(QObject* parent) : QObject(parent) {}
 
 bool ScriptEngine::loadFromJsonFile(const QString& path) {
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) return false;
-    const auto doc = QJsonDocument::fromJson(f.readAll());
-    if (!doc.isObject()) return false;
-    return parse(doc.object());
+    QJsonObject root = ResourceManager::instance().loadJsonObject(path);
+    if (root.isEmpty()) {
+        qDebug() << "Failed to load JSON object from file:" << path;
+        return false;
+    }
+
+    return parse(root);
+}
+
+bool ScriptEngine::loadFromJsonObject(const QJsonObject& root) {
+    return parse(root);
 }
 
 bool ScriptEngine::parse(const QJsonObject& root) {

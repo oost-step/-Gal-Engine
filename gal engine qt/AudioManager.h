@@ -1,26 +1,39 @@
-#pragma once
+// AudioManager.h
+#ifndef AUDIOMANAGER_H
+#define AUDIOMANAGER_H
+
 #include <QObject>
-#include <QPointer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include <QString>
 
-class QMediaPlayer;
-class QAudioOutput;
-
-class AudioManager : public QObject {
+class AudioManager : public QObject
+{
     Q_OBJECT
 public:
     explicit AudioManager(QObject* parent = nullptr);
+    
     void setBgmVolume(float v);
-
-public slots:
     void playBgm(const QString& file);
     void stopBgm();
     void playSe(const QString& file);
+    
+    // 新增功能：播放音效并连接完成信号
+    void playSeWithCallback(const QString& file, std::function<void()> callback);
+    void disconnectSeCallbacks();
+
+signals:
+    void seFinished();
 
 private:
-    QPointer<QMediaPlayer> m_bgm;
-    QPointer<QAudioOutput> m_bgmOut;
-    QPointer<QMediaPlayer> m_se;
-    QPointer<QAudioOutput> m_seOut;
+    QMediaPlayer* m_bgm;
+    QAudioOutput* m_bgmOut;
     QString m_currentBgm;
+    
+    QMediaPlayer* m_se;
+    QAudioOutput* m_seOut;
+    
+    QList<std::function<void()>> m_seCallbacks;
 };
+
+#endif // AUDIOMANAGER_H

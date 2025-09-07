@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QPointer>
 #include <QString>
+#include "AudioManager.h"
 
 class QMediaPlayer;
 class QAudioOutput;
@@ -31,6 +32,8 @@ private:
     QLabel* logoLabel;
     QPushButton* returnBtn;
     StartWindow* m_startWindow = nullptr;
+
+    AudioManager* m_audioManager = nullptr;
 
     QPixmap logoPixmap;
 };
