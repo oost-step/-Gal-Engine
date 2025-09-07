@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QTextStream>
+#include <QDirIterator>
 #include <zlib.h>
 
 ResourceManager::ResourceManager(QObject* parent) : QObject(parent) {}
@@ -200,5 +201,61 @@ QByteArray ResourceManager::zlibUncompress(const QByteArray& data) const {
 
     inflateEnd(&strm);
     result.resize(strm.total_out);
+    return result;
+}
+QFileInfoList ResourceManager::getFileList(const QString& directory,
+    const QStringList& filters,
+    bool recursive) {
+    QFileInfoList result;
+
+    if (USE_PACKED_RESOURCES) {
+        // 打包资源模式：从已加载的资源中查找
+        QString normalizedDir = normalizePath(directory);
+        if (!normalizedDir.endsWith('/')) {
+            normalizedDir += '/';
+        }
+
+        // 遍历所有资源，查找匹配的文件
+        for (auto it = m_resources.keyBegin(); it != m_resources.keyEnd(); ++it) {
+            QString filePath = *it;
+
+            // 检查是否在指定目录下
+            if (filePath.startsWith(normalizedDir)) {
+                // 检查是否匹配过滤器
+                if (filters.isEmpty() ||
+                    QDir::match(filters, QFileInfo(filePath).fileName())) {
+                    // 创建QFileInfo对象（注意：在资源包模式下，这些信息可能不完整）
+                    QFileInfo fileInfo;
+                    fileInfo.setFile(filePath); // 只设置文件路径
+                    result.append(fileInfo);
+                }
+            }
+        }
+    }
+    else {
+        // 非打包资源模式：直接从文件系统读取
+        QDir dir(directory);
+
+        if (recursive) {
+            // 递归获取所有子目录的文件
+            dir.setNameFilters(filters);
+            dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+            result = dir.entryInfoList();
+
+            // 获取所有子目录
+            QDirIterator it(directory, QDir::Dirs | QDir::NoDotAndDotDot,
+                QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+                QString subDir = it.next();
+                QDir subQDir(subDir);
+                result.append(subQDir.entryInfoList(filters, QDir::Files));
+            }
+        }
+        else {
+            // 非递归获取文件
+            result = dir.entryInfoList(filters, QDir::Files);
+        }
+    }
+
     return result;
 }

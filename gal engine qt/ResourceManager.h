@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QSet>
 #include <QMap>
+#include <QStringList>
+#include <QFileInfoList>
 
 class ResourceManager : public QObject {
     Q_OBJECT
@@ -29,6 +31,10 @@ public:
     bool loadPackage(const QString& filename);
 
     QByteArray getData(const QString& path) const;
+
+    QFileInfoList getFileList(const QString& directory,
+        const QStringList& filters = QStringList(),
+        bool recursive = false);
 
 signals:
     void imageLoaded(const QString& path);

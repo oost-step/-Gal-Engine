@@ -245,9 +245,9 @@ void GalleryWindow::loadImages(const QString& folder)
 {
     clearImages();
 
-    QDir dir(folder);
+    ResourceManager& rm = ResourceManager::instance();
     QStringList filters = { "*.png", "*.jpg", "*.jpeg" };
-    QFileInfoList files = dir.entryInfoList(filters, QDir::Files);
+    QFileInfoList files = rm.getFileList(folder, filters);
 
     for (auto& file : files) {
         imageList.append(file.absoluteFilePath());
@@ -273,26 +273,36 @@ void GalleryWindow::clearImages()
 void GalleryWindow::updateDisplay()
 {
     if (currentIndex >= 0 && currentIndex < imageList.size()) {
-        QPixmap pix(imageList[currentIndex]);
+        QPixmap pix = ResourceManager::instance().getPixmap(imageList[currentIndex]);
         if (!pix.isNull()) {
             pix = pix.scaled(displayLabel->size() * g_scaler, Qt::KeepAspectRatio, Qt::SmoothTransformation);
             displayLabel->setPixmap(pix);
         }
+        else {
+            displayLabel->setText("Image not found:\n" + imageList[currentIndex]);
+        }
     }
 }
+
 
 void GalleryWindow::updatePreview()
 {
     for (int i = 0; i < imageList.size(); ++i) {
-        QPixmap pix(imageList[i]);
+        QPixmap pix = ResourceManager::instance().getPixmap(imageList[i]);
         auto* thumb = new ClickableLabel(i);
-        thumb->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        if (!pix.isNull()) {
+            thumb->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+        else {
+            thumb->setText("Not found");
+        }
         thumb->setStyleSheet("border:2px solid gray;");
         previewLayout->addWidget(thumb);
 
         connect(thumb, &ClickableLabel::clicked, this, &GalleryWindow::onThumbnailClicked);
     }
 }
+
 
 void GalleryWindow::onThumbnailClicked(int index)
 {
@@ -337,9 +347,9 @@ void GalleryWindow::loadMusic(const QString& folder)
 {
     clearImages();
 
-    QDir dir(folder);
+    ResourceManager& rm = ResourceManager::instance();
     QStringList filters = { "*.mp3", "*.wav", "*.ogg", "*.m4a" };
-    QFileInfoList files = dir.entryInfoList(filters, QDir::Files);
+    QFileInfoList files = rm.getFileList(folder, filters);
 
     for (int i = 0; i < files.size(); ++i) {
         QString path = files[i].absoluteFilePath();

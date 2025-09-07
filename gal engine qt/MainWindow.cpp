@@ -270,11 +270,13 @@ void MainWindow::loadGame() {
     // Try default autosave
     QString fn = QDir::current().filePath("autosave_last.json");
     if (QFile::exists(fn)) {
+        m_history.clear();
         m_engine->loadSnapshotFromFile(fn);
         //statusBar()->showMessage("Loaded: " + fn, 3000);
     }
     else {
         // select
+        m_history.clear();
         loadGameFromDialog();
     }
 }
@@ -338,6 +340,7 @@ void MainWindow::loadFromSlot(int slotIndex) {
         return;
     }
 
+    m_history.clear();
     m_engine->loadSnapshotFromFile(jsonFile);
 
     //statusBar()->showMessage(QString("Loaded from slot %1").arg(slotIndex), 3000);
