@@ -18,12 +18,38 @@
 #include <QTextEdit>
 #include <QBoxLayout>
 #include <QSequentialAnimationGroup>
+#include <QToolBar>
+#include <QApplication>
+#include <QToolButton>
+#include <QLineEdit>
+#include <QTextEdit>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("GalEngine");
     //resize(1280, 720);
     setFixedSize(1280, 720);
     setStyleSheet("QMainWindow { background: white; }");
+
+    m_ctrlLongPressTimer = new QTimer(this);
+    m_ctrlLongPressTimer->setInterval(500); // 300ms 判定为长按
+    m_ctrlLongPressTimer->setSingleShot(false); // 重复触发
+    connect(m_ctrlLongPressTimer, &QTimer::timeout, this, [this]() {
+        handleAdvanceOrSkip(); // 连续触发
+    });
+
+    qApp->installEventFilter(this);
+
+    bottomToolBar = new QToolBar(this);
+    addToolBar(Qt::BottomToolBarArea, bottomToolBar);
+
+    bottomToolBar->raise();
+
+    bottomToolBar->setMovable(false);      
+    bottomToolBar->setFloatable(false);   
+
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    bottomToolBar->addWidget(spacer);
 
     m_bg = new QLabel(this);
     m_bg->setScaledContents(true);
@@ -116,7 +142,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     }
     */
     // menu actions
-    auto* saveAct = menuBar()->addAction("Save");  
+    auto* saveAct = new QAction("Save", this);  
     connect(saveAct, &QAction::triggered, this, [this]() {
         emit playSound("resources/save.mp3");
         SaveLoadWindow dlg(m_engine, SaveLoadWindow::SaveMode, this);
@@ -124,8 +150,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
         dlg.exec();
     });
+    bottomToolBar->addAction(saveAct);
 
-    auto* loadAct = menuBar()->addAction("Load");  
+
+    auto* loadAct = new QAction("Load");  
     connect(loadAct, &QAction::triggered, this, [this]() {
         emit playSound("resources/load.mp3");
         SaveLoadWindow dlg(m_engine, SaveLoadWindow::LoadMode, this);
@@ -133,17 +161,63 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         connect(&dlg, &SaveLoadWindow::loadFromSlot, this, &MainWindow::loadFromSlot);
         dlg.exec();
     });
+    bottomToolBar->addAction(loadAct);
 
-    auto* viewMenu = menuBar()->addMenu("&View");
-    auto* historyAct = viewMenu->addAction("Show History");
-    connect(historyAct, &QAction::triggered, this, &MainWindow::showHistory);
+    auto* viewAct = new QAction("View");
+    connect(viewAct, &QAction::triggered, this, &MainWindow::showHistory);
+    bottomToolBar->addAction(viewAct);
 
-    auto* returnAct = menuBar()->addAction("Return");
+    auto* returnAct = new QAction("Return");
     connect(returnAct, &QAction::triggered, this, &MainWindow::onReturnClicked);
+    bottomToolBar->addAction(returnAct);
+
+    bottomToolBar->setIconSize(QSize(24, 24));
+
+    bottomToolBar->setFixedHeight(24);
+
+    bottomToolBar->setStyleSheet(R"(
+    QToolBar {
+        background-color: transparent; /* 工具栏背景透明 */
+        border: none;                 /* 移除边框 */
+        spacing: 3px;                 /* 根据需要调整工具项间距 */
+    }
+    QToolBar::separator {
+        background: transparent;      /* 分隔符也透明 */
+    }
+    QToolBar QToolButton, 
+    QToolBar QAction {
+        color: white;               /* 白色字体 */
+        font-size: 8px;            /* 字号大小 */
+        font-family: "Microsoft YaHei"; /* 可选：设置字体 */
+        padding: 6px 6px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    QToolBar QToolButton:hover, 
+    QToolBar QAction:hover {
+        background-color: #3E3E40;  /* 悬停效果 */
+        border: 1px solid #555555;
+    }
+    QToolBar QToolButton:pressed, 
+    QToolBar QAction:pressed {
+        background-color: #007ACC;  /* 按下效果 */
+    }
+    QToolBar QToolButton:menu-indicator {
+        image: none;               /* 隐藏菜单指示器 */
+    }
+)");
+}
+
+MainWindow::~MainWindow() {
+    qApp->removeEventFilter(this);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* ev) {
     QMainWindow::resizeEvent(ev);
+    if (bottomToolBar) {
+        bottomToolBar->raise();
+    }
     layoutUi();
 }
 
@@ -159,8 +233,29 @@ void MainWindow::layoutUi() {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* ev) {
-    if (ev->key() == Qt::Key_Space || ev->key() == Qt::Key_Return) m_engine->advance();
-    else QMainWindow::keyPressEvent(ev);
+    if (ev->key() == Qt::Key_Space || ev->key() == Qt::Key_Return) {
+        if (!ev->isAutoRepeat()) {           // 单次按下和长按都只触发一次
+            handleAdvanceOrSkip();
+        }
+    }
+    else if (ev->key() == Qt::Key_Control) {
+        if (!ev->isAutoRepeat() && !m_ctrlLongPressTimer->isActive()) {
+            // Ctrl第一次按下，启动定时器，等到 300ms 后开始触发
+            m_ctrlLongPressTimer->start();
+        }
+    }
+    else {
+        QMainWindow::keyPressEvent(ev);
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* ev) {
+    if (ev->key() == Qt::Key_Control) {
+        m_ctrlLongPressTimer->stop(); // 放开 Ctrl 停止触发
+    }
+    else {
+        QMainWindow::keyReleaseEvent(ev);
+    }
 }
 
 void MainWindow::onBackgroundChanged(const QString& path) {
@@ -423,4 +518,68 @@ void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
 void MainWindow::onClose()
 {
     this->close();
+}
+
+void MainWindow::handleAdvance()
+{
+    if (!m_dialogue || !m_engine) return;
+
+    if (m_dialogue->isTyping()) {
+        m_dialogue->skipTyping();
+    }
+    else {
+        m_engine->advance();
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent* ev) {
+    QWidget* child = childAt(ev->pos());
+
+    // 如果点击的是工具栏按钮，不拦截
+    if (child && qobject_cast<QToolButton*>(child)) {
+        QMainWindow::mousePressEvent(ev);
+        return;
+    }
+
+    // 工具栏空白区域也算点击（所以不要 return）
+
+    handleAdvance();
+}
+
+void MainWindow::handleAdvanceOrSkip() {
+    if (!m_dialogue) return;
+
+    if (!m_dialogue->isTyping()) {
+        m_dialogue->skipTyping();   // 只显示完整文本，不推进
+    }
+    else if (m_engine) {
+        m_engine->advance();           // 动画结束才推进
+    }
+}
+
+bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
+    if (ev->type() == QEvent::MouseButtonPress) {
+        auto* me = static_cast<QMouseEvent*>(ev);
+        if (me->button() != Qt::LeftButton) return false;
+
+        QWidget* w = QApplication::widgetAt(me->globalPosition().toPoint());
+
+        // 工具栏按钮 → 不拦截
+        if (w && (qobject_cast<QToolButton*>(w) || qobject_cast<QAbstractButton*>(w)))
+            return false;
+
+        // 其它区域（包括对话框、背景）
+        if (m_dialogue) {
+            if (!m_dialogue->isTyping()) {
+                m_dialogue->skipTyping();
+            }
+            else if (m_engine) {
+                m_engine->advance();
+            }
+        }
+
+        return true; // 这里要 return true，避免事件再传到子控件导致重复
+    }
+
+    return QMainWindow::eventFilter(obj, ev);
 }

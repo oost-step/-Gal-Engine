@@ -11,6 +11,11 @@ public:
     void setSpeaker(const QString& name);
     void setText(const QString& t);
 
+    bool isTyping() const { return m_text->isAnimationComplete(); }
+    void skipTyping() { m_text->skipAnimation(); }
+
+    OutlineTextBrowser* textWidget() const { return m_text; }
+
 signals:
     void clicked();
 

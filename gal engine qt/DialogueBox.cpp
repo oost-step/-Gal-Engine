@@ -11,6 +11,10 @@ DialogueBox::DialogueBox(QWidget* parent) : QFrame(parent) {
     setStyleSheet("#DialogueBox { background: rgba(0,0,0,180); border-radius: 12px; }"
         "QLabel { color: white; font-weight: bold; }"
         "QTextBrowser { background: transparent; color: white; border: none; font-size: 16px; }");
+
+    connect(m_text, &OutlineTextBrowser::animationCompleteClicked,
+        this, &DialogueBox::clicked);
+
     auto* lay = new QVBoxLayout(this);
     lay->setContentsMargins(20 + 260, 16, 20, 16);
     m_name = new OutlineLabel(this);

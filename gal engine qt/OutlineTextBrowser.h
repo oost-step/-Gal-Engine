@@ -60,6 +60,7 @@ public:
 
 signals:
     void clicked();
+    void animationCompleteClicked();
 
 protected:
     void paintEvent(QPaintEvent* event) override {
@@ -106,10 +107,12 @@ protected:
 
     void mousePressEvent(QMouseEvent* event) override {
         if (event->button() == Qt::LeftButton) {
-            if (!m_animationComplete)
+            if (!m_animationComplete) {
                 skipAnimation();
-            else
-                emit clicked();
+            }
+            else {
+                emit animationCompleteClicked();
+            }
         }
         QLabel::mousePressEvent(event);
     }

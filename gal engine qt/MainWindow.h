@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QPixmap>
+#include <QTimer>
 #include "ImageLayer.h"
 #include "DialogueBox.h"
 #include "ChoiceOverlay.h"
@@ -14,12 +15,14 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
     void loadGame(); 
     void startWindowContinue();// allow external call (from StartWindow -> Continue)
 
 protected:
     void resizeEvent(QResizeEvent* ev) override;
     void keyPressEvent(QKeyEvent* ev) override;
+    bool eventFilter(QObject* obj, QEvent* ev) override;
 
 private slots:
     void onBackgroundChanged(const QString& path);
@@ -62,8 +65,16 @@ private:
 
     QAbstractAnimation* m_shakeAnimation = nullptr;
 
+    QToolBar* bottomToolBar = nullptr;
+
+    QTimer* m_ctrlLongPressTimer = nullptr;
+
     void layoutUi();
     void showHistory();
     void saveToSlot(int slotIndex);
     void loadFromSlot(int slotIndex);
+    void handleAdvance();
+    void handleAdvanceOrSkip();
+    void mousePressEvent(QMouseEvent* ev);
+    void keyReleaseEvent(QKeyEvent* ev);
 };
