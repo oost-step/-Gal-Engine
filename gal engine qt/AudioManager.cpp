@@ -1,5 +1,5 @@
 #include "AudioManager.h"
-#include "ResourceManager.h"   // 集成资源管理器
+#include "ResourceManager.h"
 #include <QUrl>
 #include <QDebug>
 #include <QBuffer>
@@ -15,7 +15,6 @@ AudioManager::AudioManager(QObject* parent) : QObject(parent) {
     m_se->setAudioOutput(m_seOut);
     m_seOut->setVolume(1.0f);
 
-    // 连接音效完成信号
     connect(m_se, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
         if (status == QMediaPlayer::EndOfMedia) {
             emit seFinished();
@@ -43,7 +42,7 @@ void AudioManager::playBgm(const QString& file) {
             qDebug() << "BGM not found in resources:" << file;
             return;
         }
-        QBuffer* buffer = new QBuffer(m_bgm);  // 父对象 = m_bgm，避免内存泄漏
+        QBuffer* buffer = new QBuffer(m_bgm);
         buffer->setData(data);
         buffer->open(QIODevice::ReadOnly);
         m_bgm->setSourceDevice(buffer);

@@ -13,8 +13,8 @@ class ResourceManager : public QObject {
 public:
     static ResourceManager& instance();
 
-    static constexpr bool USE_PACKED_RESOURCES = true;
-    // 🔹 写死的开关：true=打包模式，false=明文模式
+    static constexpr bool USE_PACKED_RESOURCES = false;
+    //开关：true=打包模式，false=明文模式
 
     void preloadImage(const QString& path);
     void preloadImages(const QStringList& paths);
@@ -50,7 +50,6 @@ private:
     mutable QMap<QString, QPixmap> m_pixmaps;
     QSet<QString> m_audioPaths;
 
-    // 存放打包文件解出的资源
     QMap<QString, QByteArray> m_resources;
 
     

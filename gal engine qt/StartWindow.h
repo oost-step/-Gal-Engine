@@ -1,4 +1,3 @@
-// StartWindow.h
 #ifndef STARTWINDOW_H
 #define STARTWINDOW_H
 
@@ -30,19 +29,16 @@ private slots:
 private:
     QPixmap logoPixmap;
 
-    // UI elements
     class QPushButton* startBtn;
     class QPushButton* continueBtn;
     class QPushButton* galleryBtn;
     class QPushButton* settingBtn;
     class QPushButton* exitBtn;
 
-    // Windows
     MainWindow* m_mainWindow = nullptr;
     SettingWindow* m_settingWindow = nullptr;
     GalleryWindow* m_galleryWindow = nullptr;
 
-    // Audio
     AudioManager* m_audioManager = nullptr;
 };
 

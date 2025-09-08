@@ -26,7 +26,6 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("GalEngine");
-    //resize(1280, 720);
     setFixedSize(1280, 720);
     setStyleSheet("QMainWindow { background: white; }");
 
@@ -91,7 +90,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     layoutUi();
 
-    // Load script
+
     QString jsonPath;
     if (ResourceManager::USE_PACKED_RESOURCES) {
         jsonPath = "assets/script.json";
@@ -119,29 +118,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
             QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
         }
     }
-    
-    /*
-      // 或者 "scripts/script.json" 取决于打包时的相对路径
-    if (!ResourceManager::instance().loadTextFile(jsonPath).isEmpty()) {
-        if (m_engine->loadFromJsonFile(jsonPath)) {
-            m_engine->start();
-        }
-        else {
-            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
-        }
-    }
-    else {
-        // 如果明文测试时还是想选文件，可以保留
-        jsonPath = QFileDialog::getOpenFileName(this, "Open Script JSON", QDir::currentPath(), "JSON (*.json)");
-        if (!jsonPath.isEmpty() && m_engine->loadFromJsonFile(jsonPath)) {
-            m_engine->start();
-        }
-        else {
-            QMessageBox::warning(this, "GalEngine", "Failed to load JSON script.");
-        }
-    }
-    */
-    // menu actions
+
+
     auto* saveAct = new QAction("Save", this);  
     connect(saveAct, &QAction::triggered, this, [this]() {
         emit playSound("resources/save.mp3");
@@ -171,9 +149,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(returnAct, &QAction::triggered, this, &MainWindow::onReturnClicked);
     bottomToolBar->addAction(returnAct);
 
-    bottomToolBar->setIconSize(QSize(24, 24));
+    bottomToolBar->setIconSize(QSize(32, 32));
 
-    bottomToolBar->setFixedHeight(24);
+    bottomToolBar->setFixedHeight(32);
 
     bottomToolBar->setStyleSheet(R"(
     QToolBar {
@@ -187,7 +165,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     QToolBar QToolButton, 
     QToolBar QAction {
         color: white;               /* 白色字体 */
-        font-size: 8px;            /* 字号大小 */
+        font-size: 12px;            /* 字号大小 */
         font-family: "Microsoft YaHei"; /* 可选：设置字体 */
         padding: 6px 6px;
         background: transparent;
@@ -206,7 +184,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     QToolBar QToolButton:menu-indicator {
         image: none;               /* 隐藏菜单指示器 */
     }
-)");
+    )");
 }
 
 MainWindow::~MainWindow() {
@@ -234,13 +212,12 @@ void MainWindow::layoutUi() {
 
 void MainWindow::keyPressEvent(QKeyEvent* ev) {
     if (ev->key() == Qt::Key_Space || ev->key() == Qt::Key_Return) {
-        if (!ev->isAutoRepeat()) {           // 单次按下和长按都只触发一次
+        if (!ev->isAutoRepeat()) {
             handleAdvanceOrSkip();
         }
     }
     else if (ev->key() == Qt::Key_Control) {
         if (!ev->isAutoRepeat() && !m_ctrlLongPressTimer->isActive()) {
-            // Ctrl第一次按下，启动定时器，等到 300ms 后开始触发
             m_ctrlLongPressTimer->start();
         }
     }
@@ -251,7 +228,7 @@ void MainWindow::keyPressEvent(QKeyEvent* ev) {
 
 void MainWindow::keyReleaseEvent(QKeyEvent* ev) {
     if (ev->key() == Qt::Key_Control) {
-        m_ctrlLongPressTimer->stop(); // 放开 Ctrl 停止触发
+        m_ctrlLongPressTimer->stop();
     }
     else {
         QMainWindow::keyReleaseEvent(ev);
@@ -269,7 +246,6 @@ void MainWindow::onBackgroundChanged(const QString& path) {
 
     if (auto* oldEff = qobject_cast<QGraphicsOpacityEffect*>(m_bg->graphicsEffect())) {
         m_bg->setGraphicsEffect(nullptr);
-        //oldEff->deleteLater();
     }
 
     const int fadeDurationMs = 400;
@@ -285,8 +261,7 @@ void MainWindow::onBackgroundChanged(const QString& path) {
     anim->setEasingCurve(QEasingCurve::InOutQuad);
 
     QObject::connect(anim, &QPropertyAnimation::finished, m_bg, [this, effect]() {
-        m_bg->setGraphicsEffect(nullptr); // 移除效果
-        //effect->deleteLater();
+        m_bg->setGraphicsEffect(nullptr);
     });
 
     anim->start(QAbstractAnimation::DeleteWhenStopped);
@@ -377,7 +352,7 @@ void MainWindow::loadGame() {
 }
 
 void MainWindow::onReturnClicked() {
-    m_engine->stopBgm(); // 停止背景音乐
+    m_engine->stopBgm();
     if (!m_startWindow) {
         m_startWindow = new StartWindow();
     }
@@ -484,7 +459,7 @@ void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
     anim->setDuration(duration);
     anim->setStartValue(0.0);
     anim->setEndValue(1.0);
-    anim->setEasingCurve(QEasingCurve::Linear); // 我们手动控制轨迹
+    anim->setEasingCurve(QEasingCurve::Linear); // 手动控制轨迹
 
     connect(anim, &QVariantAnimation::valueChanged, this, [=](const QVariant& value) {
         double progress = value.toDouble(); // [0,1]
@@ -578,7 +553,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
             }
         }
 
-        return true; // 这里要 return true，避免事件再传到子控件导致重复
+        return true; // return true，避免事件再传到子控件导致重复
     }
 
     return QMainWindow::eventFilter(obj, ev);

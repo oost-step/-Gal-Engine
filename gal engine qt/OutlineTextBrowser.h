@@ -14,7 +14,7 @@ public:
         m_timer = new QTimer(this);
         connect(m_timer, &QTimer::timeout, this, &OutlineTextBrowser::updateText);
 
-        setWordWrap(true);   // 启用 QLabel 的换行属性（便于计算大小）
+        setWordWrap(true);
     }
 
     // 设置逐字显示的延迟时间（毫秒）
@@ -27,22 +27,20 @@ public:
 
     int displayDelay() const { return m_displayDelay; }
 
-    // 设置文本并启动打字机效果
     void setTextWithAnimation(const QString& text) {
         m_fullText = text;
         m_currentIndex = 0;
         m_animationComplete = false;
-        QLabel::setText(""); // 清空 QLabel 内部缓存
+        QLabel::setText("");
         m_timer->start(m_displayDelay);
         update();
     }
 
-    // 重写 setText 保持兼容性
     void setText(const QString& text) {
         m_fullText = text;
         m_currentIndex = 0;
         m_animationComplete = false;
-        QLabel::setText(""); // 清空 QLabel 内部缓存
+        QLabel::setText("");
         m_timer->start(m_displayDelay);
         update();
     }
@@ -75,7 +73,6 @@ protected:
 
         QString displayText = m_animationComplete ? m_fullText : m_fullText.left(m_currentIndex);
 
-        // 使用 QTextLayout 实现自动换行
         QTextLayout textLayout(displayText, font);
         textLayout.beginLayout();
         QVector<QTextLine> lines;
@@ -88,7 +85,6 @@ protected:
         }
         textLayout.endLayout();
 
-        // 逐行绘制带轮廓的文字
         QPainterPath path;
         for (int i = 0; i < lines.size(); ++i) {
             QTextLine line = lines.at(i);
@@ -97,7 +93,6 @@ protected:
             path.addText(0, y, font, lineText);
         }
 
-        // 描边
         QPen pen(QColor(255, 255, 0, 180));
         pen.setWidthF(1.2);
         painter.setPen(pen);

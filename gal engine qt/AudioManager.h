@@ -1,4 +1,3 @@
-// AudioManager.h
 #ifndef AUDIOMANAGER_H
 #define AUDIOMANAGER_H
 
@@ -18,7 +17,6 @@ public:
     void stopBgm();
     void playSe(const QString& file);
     
-    // 新增功能：播放音效并连接完成信号
     void playSeWithCallback(const QString& file, std::function<void()> callback);
     void disconnectSeCallbacks();
 

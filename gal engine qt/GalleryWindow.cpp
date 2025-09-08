@@ -17,13 +17,12 @@
 #include <QPainter>
 
 const float g_scaler = 1.0;
-const QString BACKGROUND_IMAGE_PATH = "";
+const QString BACKGROUND_IMAGE_PATH = "resources/background.png";
 const QString LOGO_IMAGE_PATH = "resources/logo.png";
 const double LOGO_SCALE_FACTOR = 0.3;
 const int BUTTON_WIDTH = 160;
 const int BUTTON_HEIGHT = 50;
 
-// 音频文件路径
 const QString GALLERY_BGM_PATH = "resources/mako.mp3";
 const QString CG_SOUND_PATH = "resources/CG.mp3";
 const QString HSCENE_SOUND_PATH = "resources/hscene.mp3";
@@ -35,23 +34,19 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
     setWindowTitle("GalEngine - Gallery");
     setFixedSize(1280, 720);
 
-    // 创建音频管理器
     m_audioManager = new AudioManager(this);
 
-    // 预加载图片资源
     if (!BACKGROUND_IMAGE_PATH.isEmpty()) {
         ResourceManager::instance().preloadImage(BACKGROUND_IMAGE_PATH);
     }
     ResourceManager::instance().preloadImage(LOGO_IMAGE_PATH);
 
-    // 注册音频资源
     ResourceManager::instance().registerAudio(GALLERY_BGM_PATH);
     ResourceManager::instance().registerAudio(CG_SOUND_PATH);
     ResourceManager::instance().registerAudio(HSCENE_SOUND_PATH);
     ResourceManager::instance().registerAudio(STAND_SOUND_PATH);
     ResourceManager::instance().registerAudio(MUSIC_SOUND_PATH);
 
-    // 播放背景音乐
     if (ResourceManager::instance().hasAudio(GALLERY_BGM_PATH)) {
         m_audioManager->playBgm(GALLERY_BGM_PATH);
     }
@@ -120,7 +115,6 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
     centerLayout->addWidget(nextBtn);
     mainLayout->addLayout(centerLayout);
 
-    // ---------- 底部缩略图区域 ----------
     previewArea = new QScrollArea(this);
     previewWidget = new QWidget();
     previewLayout = new QHBoxLayout(previewWidget);
@@ -140,10 +134,8 @@ GalleryWindow::GalleryWindow(QWidget* parent) : QWidget(parent)
     connect(prevBtn, &QPushButton::clicked, this, &GalleryWindow::showPrevImage);
     connect(nextBtn, &QPushButton::clicked, this, &GalleryWindow::showNextImage);
 
-    // 从 ResourceManager 获取 logo 图片
     logoPixmap = ResourceManager::instance().getPixmap(LOGO_IMAGE_PATH);
     if (logoPixmap.isNull()) {
-        // 如果从ResourceManager获取失败，尝试直接加载
         logoPixmap.load(LOGO_IMAGE_PATH);
     }
 }
@@ -154,18 +146,15 @@ GalleryWindow::~GalleryWindow()
         delete m_startWindow;
 }
 
-// ====== 绘制背景 & Logo ======
 void GalleryWindow::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     QPainter painter(this);
 
-    // 从 ResourceManager 获取背景图片
     QPixmap background;
     if (!BACKGROUND_IMAGE_PATH.isEmpty()) {
         background = ResourceManager::instance().getPixmap(BACKGROUND_IMAGE_PATH);
         if (background.isNull()) {
-            // 如果从ResourceManager获取失败，尝试直接加载
             background.load(BACKGROUND_IMAGE_PATH);
         }
     }
@@ -186,10 +175,8 @@ void GalleryWindow::paintEvent(QPaintEvent* event)
     }
 }
 
-// ====== 按钮逻辑 ======
 void GalleryWindow::onCgGame()
 {
-    // 使用 ResourceManager 检查音频是否存在
     if (ResourceManager::instance().hasAudio(CG_SOUND_PATH)) {
         m_audioManager->playSeWithCallback(CG_SOUND_PATH, [this]() {
             loadImages("assets/bg");
@@ -197,14 +184,12 @@ void GalleryWindow::onCgGame()
     }
     else {
         qDebug() << "CG sound file not found:" << CG_SOUND_PATH;
-        // 即使没有音效也继续执行
         loadImages("assets/bg");
     }
 }
 
 void GalleryWindow::onHsceneGame()
 {
-    // 使用 ResourceManager 检查音频是否存在
     if (ResourceManager::instance().hasAudio(HSCENE_SOUND_PATH)) {
         m_audioManager->playSeWithCallback(HSCENE_SOUND_PATH, [this]() {
             clearImages();
@@ -212,14 +197,12 @@ void GalleryWindow::onHsceneGame()
     }
     else {
         qDebug() << "Hscene sound file not found:" << HSCENE_SOUND_PATH;
-        // 即使没有音效也继续执行
         clearImages();
     }
 }
 
 void GalleryWindow::onStandGame()
 {
-    // 使用 ResourceManager 检查音频是否存在
     if (ResourceManager::instance().hasAudio(STAND_SOUND_PATH)) {
         m_audioManager->playSeWithCallback(STAND_SOUND_PATH, [this]() {
             loadImages("assets/ch");
@@ -227,7 +210,6 @@ void GalleryWindow::onStandGame()
     }
     else {
         qDebug() << "Stand sound file not found:" << STAND_SOUND_PATH;
-        // 即使没有音效也继续执行
         loadImages("assets/ch");
     }
 }
@@ -330,7 +312,6 @@ void GalleryWindow::showNextImage()
 
 void GalleryWindow::onMusicGame()
 {
-    // 使用 ResourceManager 检查音频是否存在
     if (ResourceManager::instance().hasAudio(MUSIC_SOUND_PATH)) {
         m_audioManager->playSeWithCallback(MUSIC_SOUND_PATH, [this]() {
             loadMusic("assets/bgm");
@@ -338,7 +319,6 @@ void GalleryWindow::onMusicGame()
     }
     else {
         qDebug() << "Music sound file not found:" << MUSIC_SOUND_PATH;
-        // 即使没有音效也继续执行
         loadMusic("assets/bgm");
     }
 }
@@ -348,7 +328,7 @@ void GalleryWindow::loadMusic(const QString& folder)
     clearImages();
 
     ResourceManager& rm = ResourceManager::instance();
-    QStringList filters = { "*.mp3", "*.wav", "*.ogg", "*.m4a" };
+    QStringList filters = { "*.mp3", "*.wav", "*.ogg", "*.m4a", "*.opus" };
     QFileInfoList files = rm.getFileList(folder, filters);
 
     for (int i = 0; i < files.size(); ++i) {

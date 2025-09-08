@@ -21,8 +21,6 @@ SaveLoadWindow::SaveLoadWindow(ScriptEngine* engine, Mode mode, QWidget* parent)
     QGridLayout* grid = new QGridLayout();
     for (int i = 0; i < m_slotsPerPage; i++) {
         QPushButton* btn = new QPushButton(this);
-        //btn->setFixedSize(220, 120);
-        //btn->setStyleSheet("QPushButton { text-align: left; }");
         connect(btn, &QPushButton::clicked, this, [this, i]() { onSlotClicked(i); });
         grid->addWidget(btn, i / 3, i % 3);
         m_slotButtons.append(btn);

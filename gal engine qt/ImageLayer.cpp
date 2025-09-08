@@ -38,7 +38,6 @@ void ImageLayer::setSprite(const QString& slot, const QPixmap& px, int fadeInDur
     QLabel* lbl = pick(slot);
     if (!lbl) return;
 
-    // 如果已经有动画在运行，先停止它
     if (m_animations.contains(lbl)) {
         QPropertyAnimation* oldAnim = m_animations.value(lbl);
         if (oldAnim && oldAnim->state() == QPropertyAnimation::Running) {
@@ -49,7 +48,7 @@ void ImageLayer::setSprite(const QString& slot, const QPixmap& px, int fadeInDur
 
     // 设置初始透明度为0（完全透明）
     lbl->setPixmap(px);
-    lbl->setGraphicsEffect(nullptr); // 清除之前的特效
+    lbl->setGraphicsEffect(nullptr);
 
     QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(lbl);
     effect->setOpacity(0.0); // 初始完全透明
@@ -57,18 +56,14 @@ void ImageLayer::setSprite(const QString& slot, const QPixmap& px, int fadeInDur
     lbl->show();
     layoutSprites();
 
-    // 创建淡入动画
     QPropertyAnimation* fadeIn = new QPropertyAnimation(effect, "opacity");
     fadeIn->setDuration(fadeInDuration);
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);
     fadeIn->setEasingCurve(QEasingCurve::InOutQuad);
 
-    // 动画完成后清理
     connect(fadeIn, &QPropertyAnimation::finished, [lbl, effect, this]() {
-        // 动画完成后移除特效，恢复正常显示
         lbl->setGraphicsEffect(nullptr);
-        //delete effect;
         m_animations.remove(lbl);
     });
 
@@ -80,7 +75,6 @@ void ImageLayer::clearSprite(const QString& slot, int fadeOutDuration)
 {
     QLabel* lbl = pick(slot);
     if (!lbl || !lbl->isVisible() || lbl->pixmap().isNull()) {
-        // 如果label不存在、不可见或没有图片，直接清理
         if (lbl) {
             lbl->clear();
             lbl->hide();
@@ -88,7 +82,6 @@ void ImageLayer::clearSprite(const QString& slot, int fadeOutDuration)
         return;
     }
 
-    // 如果已经有动画在运行，先停止它
     if (m_animations.contains(lbl)) {
         QPropertyAnimation* oldAnim = m_animations.value(lbl);
         if (oldAnim && oldAnim->state() == QPropertyAnimation::Running) {
@@ -98,7 +91,6 @@ void ImageLayer::clearSprite(const QString& slot, int fadeOutDuration)
         m_animations.remove(lbl);
     }
 
-    // 获取当前的特效或创建新的
     QGraphicsOpacityEffect* effect = qobject_cast<QGraphicsOpacityEffect*>(lbl->graphicsEffect());
     if (!effect) {
         effect = new QGraphicsOpacityEffect(lbl);
@@ -106,23 +98,20 @@ void ImageLayer::clearSprite(const QString& slot, int fadeOutDuration)
         lbl->setGraphicsEffect(effect);
     }
 
-    // 创建淡出动画
     QPropertyAnimation* fadeOut = new QPropertyAnimation(effect, "opacity", this);
     fadeOut->setDuration(fadeOutDuration);
     fadeOut->setStartValue(effect->opacity()); // 从当前透明度开始
     fadeOut->setEndValue(0.0);
     fadeOut->setEasingCurve(QEasingCurve::InOutQuad);
 
-    // 动画完成后清理
     connect(fadeOut, &QPropertyAnimation::finished, this, [=]() {
         lbl->clear();
         lbl->hide();
-        lbl->setGraphicsEffect(nullptr); // 移除特效
+        lbl->setGraphicsEffect(nullptr);
 
         if (m_animations.value(lbl) == fadeOut) {
             m_animations.remove(lbl);
         }
-        //fadeOut->deleteLater();
     });
 
     m_animations.insert(lbl, fadeOut);

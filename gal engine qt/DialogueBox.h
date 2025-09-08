@@ -19,10 +19,6 @@ public:
 signals:
     void clicked();
 
-/*
-protected:
-    void mousePressEvent(QMouseEvent* ev) override;
-*/
 
 private:
     OutlineLabel* m_name;
