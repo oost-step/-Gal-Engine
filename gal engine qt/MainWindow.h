@@ -19,10 +19,15 @@ public:
     void loadGame(); 
     void startWindowContinue();// allow external call (from StartWindow -> Continue)
 
+    QTimer* m_modeTimer = nullptr;
+    QTimer* m_autoDelayTimer = nullptr;
+
 protected:
     void resizeEvent(QResizeEvent* ev) override;
     void keyPressEvent(QKeyEvent* ev) override;
     bool eventFilter(QObject* obj, QEvent* ev) override;
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private slots:
     void onBackgroundChanged(const QString& path);
@@ -69,6 +74,13 @@ private:
 
     QTimer* m_ctrlLongPressTimer = nullptr;
 
+    QVariantMap m_tempSnapshot;
+
+    int m_autoWaitCount; // 自动模式等待计数器
+    bool m_skipAllMode;  // 真正的快进模式（跳过所有已读内容）
+
+    bool m_pausedBySetting = false;     // 打开 Setting 时暂停推进的标记
+
     void layoutUi();
     void showHistory();
     void saveToSlot(int slotIndex);
@@ -77,4 +89,5 @@ private:
     void handleAdvanceOrSkip();
     void mousePressEvent(QMouseEvent* ev);
     void keyReleaseEvent(QKeyEvent* ev);
+    void enableSkipAllMode(bool enable);
 };

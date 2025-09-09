@@ -11,6 +11,8 @@
 #include <QString>
 #include <QMap>
 
+bool iswaiting = false;
+
 ScriptEngine::ScriptEngine(QObject* parent) : QObject(parent) {}
 
 bool ScriptEngine::loadFromJsonFile(const QString& path) {
@@ -171,9 +173,15 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
         advance();
     }
     else if (c == "wait") {
+        iswaiting = true;
         int ms = ln.args.value("ms").toInt();
         if (ms <= 0) ms = 500;
-        QTimer::singleShot(ms, this, &ScriptEngine::advance);
+
+        QTimer::singleShot(ms, this, [this]() {
+            iswaiting = false;
+            advance();
+        });
+
         emit waitRequested(ms);
     }
     else if (c == "ch") {
@@ -312,7 +320,10 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
     }
     else if (c == "end") {
         onBackGame();
-        }
+    }
+    else if (c == "savehid") {
+        onSaveHidGame();
+    }
     else {
         advance();
     }
@@ -433,11 +444,22 @@ void ScriptEngine::loadSnapshotFromFile(const QString& filename) {
 
 void ScriptEngine::onBackGame() {
     emit stopBgm();
-    if (!m_startWindow) {
-        m_startWindow = new StartWindow();
-    }
-    m_startWindow->show();
+    emit requestReturnToStart(); // ²»ÔÚ engine ÄÚ new StartWindow
     emit close();
+}
+
+void ScriptEngine::onSaveHidGame() {
+    QVariantMap m;
+
+    m["hidden"] = 1;
+
+    QJsonDocument doc = QJsonDocument::fromVariant(m);
+    QFile f("saves/hidden.json");
+    if (f.open(QIODevice::WriteOnly)) {
+        f.write(doc.toJson(QJsonDocument::Compact));
+        f.close();
+    }
+    qDebug() << "Hidden saved. ";
 }
 
 void ScriptEngine::saveSnapshotWithMeta(const QString& filename,

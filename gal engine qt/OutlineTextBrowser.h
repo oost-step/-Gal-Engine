@@ -51,6 +51,7 @@ public:
             m_currentIndex = m_fullText.length();
             m_animationComplete = true;
             update();
+            emit animationComplete(); // 添加信号发射
         }
     }
 
@@ -59,6 +60,7 @@ public:
 signals:
     void clicked();
     void animationCompleteClicked();
+    void animationComplete(); // 添加动画完成信号
 
 protected:
     void paintEvent(QPaintEvent* event) override {
@@ -121,6 +123,7 @@ private slots:
         else {
             m_timer->stop();
             m_animationComplete = true;
+            emit animationComplete(); // 添加信号发射
         }
     }
 

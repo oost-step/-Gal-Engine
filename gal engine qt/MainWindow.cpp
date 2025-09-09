@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 #include "StartWindow.h"
 #include "SaveLoadWindow.h"
+#include "SettingWindow.h"
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QMessageBox>
@@ -65,6 +66,40 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     m_engine = new ScriptEngine(this);
     m_audio = new AudioManager(this);
+
+    m_autoWaitCount = 0;
+    m_skipAllMode = false;
+
+    m_modeTimer = new QTimer(this);
+    m_autoDelayTimer = new QTimer(this); // 用于自动模式的延迟计时
+    m_autoDelayTimer->setSingleShot(true); // 设置为单次触发
+
+    connect(m_modeTimer, &QTimer::timeout, this, [this]() {
+        if (g_skipMode) {
+            // 快进模式：立即跳过当前文本并推进
+            if (m_dialogue->isTyping()) {
+                m_dialogue->skipTyping();
+            }
+            m_engine->advance();
+        }
+    });
+
+    // 连接文本动画完成信号到自动模式处理
+    connect(m_dialogue, &DialogueBox::textAnimationComplete, this, [this]() {
+        if (g_autoMode && !g_skipMode) {
+            // 文本动画完成后，启动延迟计时器
+            m_autoDelayTimer->start(1000); // 1秒后自动前进
+        }
+    });
+
+    // 连接自动延迟计时器
+    connect(m_autoDelayTimer, &QTimer::timeout, this, [this]() {
+        if (g_autoMode && !g_skipMode) {
+            m_engine->advance();
+        }
+    });
+
+    m_modeTimer->start(100); // 每100ms检查一次模式
 
 
     connect(m_engine, &ScriptEngine::backgroundChanged, this, &MainWindow::onBackgroundChanged);
@@ -140,6 +175,25 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         dlg.exec();
     });
     bottomToolBar->addAction(loadAct);
+
+    auto* settingAct = new QAction("Setting", this);
+    connect(settingAct, &QAction::triggered, this, [this]() {
+        m_tempSnapshot = m_engine->snapshot();
+
+        // 传 caller=this，确保 SettingWindow 能识别来源
+        auto* setting = new SettingWindow(nullptr, true, this);
+
+        connect(setting, &SettingWindow::closedFromMainWindow, this, [this]() {
+            if (!m_tempSnapshot.isEmpty()) {
+                m_engine->restore(m_tempSnapshot);
+            }
+            this->show();
+        });
+
+        this->hide();
+        setting->show();
+    });
+    bottomToolBar->addAction(settingAct);
 
     auto* viewAct = new QAction("View");
     connect(viewAct, &QAction::triggered, this, &MainWindow::showHistory);
@@ -219,6 +273,9 @@ void MainWindow::keyPressEvent(QKeyEvent* ev) {
     else if (ev->key() == Qt::Key_Control) {
         if (!ev->isAutoRepeat() && !m_ctrlLongPressTimer->isActive()) {
             m_ctrlLongPressTimer->start();
+
+            // 按下Ctrl键时启用跳过所有模式
+            enableSkipAllMode(true);
         }
     }
     else {
@@ -226,9 +283,13 @@ void MainWindow::keyPressEvent(QKeyEvent* ev) {
     }
 }
 
+// 修改keyReleaseEvent以支持释放Ctrl键时退出跳过所有模式
 void MainWindow::keyReleaseEvent(QKeyEvent* ev) {
     if (ev->key() == Qt::Key_Control) {
         m_ctrlLongPressTimer->stop();
+
+        // 释放Ctrl键时退出跳过所有模式
+        enableSkipAllMode(false);
     }
     else {
         QMainWindow::keyReleaseEvent(ev);
@@ -304,6 +365,8 @@ void MainWindow::onTextReady(const QString& speaker, const QString& text) {
 }
 
 void MainWindow::onChoiceRequested(const QString& prompt, const QStringList& options) {
+    // 遇到选择枝时退出跳过所有模式
+    enableSkipAllMode(false);
     m_choices->setChoices(prompt, options);
 }
 
@@ -351,7 +414,14 @@ void MainWindow::loadGame() {
     }
 }
 
-void MainWindow::onReturnClicked() {
+void MainWindow::onReturnClicked()
+{
+    // 停止所有定时器和模式
+    m_modeTimer->stop();
+    m_autoDelayTimer->stop();
+    m_ctrlLongPressTimer->stop();
+    enableSkipAllMode(false);
+
     m_engine->stopBgm();
     if (!m_startWindow) {
         m_startWindow = new StartWindow();
@@ -498,12 +568,13 @@ void MainWindow::onClose()
 void MainWindow::handleAdvance()
 {
     if (!m_dialogue || !m_engine) return;
-
-    if (m_dialogue->isTyping()) {
-        m_dialogue->skipTyping();
-    }
-    else {
-        m_engine->advance();
+    if (!iswaiting){
+        if (!m_dialogue->isTyping()) {
+            m_dialogue->skipTyping();
+        }
+        else if (m_engine) {
+            m_engine->advance();
+        }
     }
 }
 
@@ -524,12 +595,22 @@ void MainWindow::mousePressEvent(QMouseEvent* ev) {
 void MainWindow::handleAdvanceOrSkip() {
     if (!m_dialogue) return;
 
-    if (!m_dialogue->isTyping()) {
-        m_dialogue->skipTyping();   // 只显示完整文本，不推进
+    if (m_skipAllMode) {
+        // 在跳过所有模式下，直接推进而不检查文本状态
+        m_engine->advance();
     }
-    else if (m_engine) {
-        m_engine->advance();           // 动画结束才推进
+    else if (!g_autoMode && !g_skipMode) {
+        // 默认模式 → 手动推进
+        if (!iswaiting) {
+            if (!m_dialogue->isTyping()) {
+                m_dialogue->skipTyping();
+            }
+            else if (m_engine) {
+                m_engine->advance();
+            }
+        }
     }
+    // 如果是auto/skip模式，就交给m_modeTimer自动驱动
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
@@ -543,13 +624,28 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
         if (w && (qobject_cast<QToolButton*>(w) || qobject_cast<QAbstractButton*>(w)))
             return false;
 
+        if (w) {
+            // 检查点击的窗口是否是模态对话框
+            QWidget* topLevel = w->window();
+            if (topLevel && topLevel != this && topLevel->isModal()) {
+                return false; // 不拦截模态对话框内的点击
+            }
+
+            // 检查点击的窗口是否是子窗口（如History对话框）
+            if (topLevel && topLevel != this && topLevel->isWindow()) {
+                return false; // 不拦截子窗口内的点击
+            }
+        }
+
         // 其它区域（包括对话框、背景）
         if (m_dialogue) {
-            if (!m_dialogue->isTyping()) {
-                m_dialogue->skipTyping();
-            }
-            else if (m_engine) {
-                m_engine->advance();
+            if (!iswaiting) {
+                if (!m_dialogue->isTyping()) {
+                    m_dialogue->skipTyping();
+                }
+                else if (m_engine) {
+                    m_engine->advance();
+                }
             }
         }
 
@@ -557,4 +653,45 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
     }
 
     return QMainWindow::eventFilter(obj, ev);
+}
+
+void MainWindow::enableSkipAllMode(bool enable) {
+    m_skipAllMode = enable;
+
+    if (m_skipAllMode) {
+        // 进入跳过所有模式时，立即跳过当前文本
+        if (m_dialogue->isTyping()) {
+            m_dialogue->skipTyping();
+        }
+
+        // 设置更快的定时器间隔以实现快速跳过
+        m_modeTimer->setInterval(5);
+    }
+    else {
+        // 退出跳过所有模式时，恢复正常定时器间隔
+        m_modeTimer->setInterval(100);
+    }
+}
+
+void MainWindow::hideEvent(QHideEvent* event)
+{
+    QMainWindow::hideEvent(event);
+
+    // 停止所有定时器
+    m_modeTimer->stop();
+    m_autoDelayTimer->stop();
+    m_ctrlLongPressTimer->stop();
+
+    // 退出跳过所有模式
+    enableSkipAllMode(false);
+}
+
+void MainWindow::showEvent(QShowEvent* event)
+{
+    QMainWindow::showEvent(event);
+
+    // 如果处于自动或快进模式，重新启动定时器
+    if (g_autoMode || g_skipMode) {
+        m_modeTimer->start(100);
+    }
 }

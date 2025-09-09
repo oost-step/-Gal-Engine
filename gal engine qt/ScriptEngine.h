@@ -8,6 +8,8 @@
 
 class StartWindow;
 
+extern bool iswaiting;
+
 class ScriptEngine : public QObject {
     Q_OBJECT
 public:
@@ -39,6 +41,7 @@ signals:
     void autosavePoint(const QString& name);
     void shakeWindow(const int amplitude,const int duration,const int shakeCount);
     void close();
+    void requestReturnToStart();
 
 public slots:
     void advance();
@@ -64,6 +67,8 @@ private:
     int m_lineIndex = 0;
     QVariantMap m_flags;
     QStack<QPair<QString, int>> m_history;
+
+    void onSaveHidGame();
 
     StartWindow* m_startWindow = nullptr;
 };

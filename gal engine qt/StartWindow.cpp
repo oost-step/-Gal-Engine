@@ -37,6 +37,7 @@ const QString EXIT_SOUND_PATH = "resources/exit.mp3";
 
 StartWindow::StartWindow(QWidget* parent) : QWidget(parent)
 {
+    loadHidden();
     setWindowTitle("GalEngine - Start");
     setFixedSize(1280, 720);
 
@@ -135,6 +136,10 @@ StartWindow::~StartWindow()
 {
     if (m_mainWindow)
         delete m_mainWindow;
+    if (m_galleryWindow)
+        delete m_galleryWindow;
+    if (m_settingWindow)
+        delete m_settingWindow;
 }
 
 void StartWindow::paintEvent(QPaintEvent* event)
@@ -241,20 +246,30 @@ void StartWindow::onSettingGame()
 {
     m_audioManager->stopBgm();
 
-    if (ResourceManager::instance().hasAudio(SETTING_SOUND_PATH)) {
-        m_audioManager->playSeWithCallback(SETTING_SOUND_PATH, [this]() {
-            if (!m_settingWindow)
-                m_settingWindow = new SettingWindow();
-            m_settingWindow->show();
-            this->close();
+    auto openSetting = [this]() {
+        // parent = nullptr，传 caller = this
+        SettingWindow* setting = new SettingWindow(nullptr, false, this);
+        // 监听 modesChanged（如果需要在 StartWindow 中做 UI 更新）
+        connect(setting, &SettingWindow::modesChanged, this, [this](bool a, bool s) {
+            Q_UNUSED(a); Q_UNUSED(s);
+            // StartWindow 可根据需要更新界面
         });
+        connect(setting, &SettingWindow::closedFromStartWindow, this, [this, setting]() {
+            // 恢复 StartWindow 的显示与BGM（由StartWindow自主管理）
+            this->show();
+            // 让 StartWindow 自己在 showEvent 中播放 BGM（见下）
+            setting->deleteLater();
+        });
+
+        this->hide();
+        setting->show();
+    };
+
+    if (ResourceManager::instance().hasAudio(SETTING_SOUND_PATH)) {
+        m_audioManager->playSeWithCallback(SETTING_SOUND_PATH, openSetting);
     }
     else {
-        qDebug() << "Setting sound file not found:" << SETTING_SOUND_PATH;
-        if (!m_settingWindow)
-            m_settingWindow = new SettingWindow();
-        m_settingWindow->show();
-        this->close();
+        openSetting();
     }
 }
 
@@ -270,5 +285,42 @@ void StartWindow::onExitGame()
     else {
         qDebug() << "Exit sound file not found:" << EXIT_SOUND_PATH;
         QApplication::quit();
+    }
+}
+
+void StartWindow::loadHidden() {
+    QString jsonFile = QString("saves/hidden.json");
+    if (!QFile::exists(jsonFile)) {
+        hidden = 0;
+        qDebug() << "Hidden number: " << hidden;
+        return;
+    }
+    QFile f(jsonFile);
+    if (!f.open(QIODevice::ReadOnly))
+    {
+        hidden = 0;
+        qDebug() << "Hidden number: " << hidden;
+        return;
+    }
+    const auto doc = QJsonDocument::fromJson(f.readAll());
+    if (!doc.isObject())
+    {
+        qDebug() << "Hidden number: " << hidden;
+        hidden = 0;
+        return;
+    }
+    QVariantMap m = doc.toVariant().toMap();
+    hidden = m.value("hidden").toInt();
+    qDebug() << "Hidden number: " << hidden;
+    return;
+}
+
+void StartWindow::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+
+    // 确保BGM在窗口显示时播放
+    if (ResourceManager::instance().hasAudio(BGM_PATH)) {
+        m_audioManager->playBgm(BGM_PATH);
     }
 }

@@ -16,8 +16,11 @@ public:
     explicit StartWindow(QWidget* parent = nullptr);
     ~StartWindow();
 
+    int hidden = 0;
+
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private slots:
     void onStartGame();
@@ -40,6 +43,8 @@ private:
     GalleryWindow* m_galleryWindow = nullptr;
 
     AudioManager* m_audioManager = nullptr;
+
+    void loadHidden();
 };
 
 #endif // STARTWINDOW_H

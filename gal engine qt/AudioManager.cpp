@@ -62,6 +62,10 @@ void AudioManager::stopBgm() {
     }
 }
 
+bool AudioManager::isBgmPlaying() const {
+    return m_bgm && (m_bgm->playbackState() == QMediaPlayer::PlayingState);
+}
+
 void AudioManager::playSe(const QString& file) {
     if (file.isEmpty()) return;
     if (m_se->playbackState() == QMediaPlayer::PlayingState) m_se->stop();

@@ -18,6 +18,7 @@ public:
 
 signals:
     void clicked();
+    void textAnimationComplete(); // 添加动画完成信号
 
 
 private:

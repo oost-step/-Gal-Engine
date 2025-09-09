@@ -20,6 +20,8 @@ public:
     void playSeWithCallback(const QString& file, std::function<void()> callback);
     void disconnectSeCallbacks();
 
+    bool isBgmPlaying() const;
+
 signals:
     void seFinished();
 
