@@ -65,27 +65,28 @@ SettingWindow::SettingWindow(QWidget* parent, bool fromMain, QWidget* caller)
     }
 
     setStyleSheet(R"(
-        QRadioButton {
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            spacing: 10px;
-        }
-        QRadioButton::indicator {
-            width: 20px;
-            height: 20px;
-        }
-        QRadioButton::indicator:unchecked {
-            border: 2px solid #FF69B4;
-            border-radius: 10px;
-            background: transparent;
-        }
-        QRadioButton::indicator:checked {
-            border: 2px solid #FF69B4;
-            border-radius: 10px;
-            background-color: rgba(255,105,180,180);
-        }
-    )");
+    QPushButton {
+        background-color: rgba(125, 105, 150, 200); /* ÁÁ·ÛÉ« */
+        color: white;
+        border: 2px solid #FF69B4;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(125, 105, 150, 100);
+    }
+    QPushButton:hover {
+        background-color: rgba(125, 130, 170, 230);
+        border: 2px solid #FF82C8;
+        border-radius: 14px;
+        box-shadow: 0 0 15px rgba(125, 105, 150, 150);
+    }
+    QPushButton:pressed {
+        background-color: rgba(120, 80, 125, 255);
+        border: 2px solid #DC509B;
+        box-shadow: 0 0 5px rgba(125, 105, 150, 100);
+    }
+)");
 
     auto* mainLayout = new QHBoxLayout(this);
     mainLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));

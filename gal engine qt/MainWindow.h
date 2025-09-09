@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QTimer>
+#include <QPointer>
 #include "ImageLayer.h"
 #include "DialogueBox.h"
 #include "ChoiceOverlay.h"
@@ -68,7 +69,7 @@ private:
 
     QPixmap m_bgPixmap;
 
-    QAbstractAnimation* m_shakeAnimation = nullptr;
+    QPointer<QAbstractAnimation> m_shakeAnimation = nullptr;
 
     QToolBar* bottomToolBar = nullptr;
 

@@ -16,6 +16,10 @@ public:
 
     OutlineTextBrowser* textWidget() const { return m_text; }
 
+protected:
+    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+
 signals:
     void clicked();
     void textAnimationComplete(); // 添加动画完成信号

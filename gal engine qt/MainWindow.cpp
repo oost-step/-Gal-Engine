@@ -497,7 +497,7 @@ void MainWindow::startWindowContinue()
 void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
 {
     if (amplitude <= 0) {
-        shakeCount = 50;
+        amplitude = 50; // 设置合理的默认值
     }
     if (shakeCount <= 0) {
         shakeCount = 10;
@@ -506,12 +506,14 @@ void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
         duration = 1500;
     }
 
-    if (m_shakeAnimation) {
+    // 检查并清理旧的动画指针 - 使用 data() 获取原始指针
+    if (!m_shakeAnimation.isNull()) {
+        // 断开连接 - 使用 m_shakeAnimation.data() 获取原始指针
+        disconnect(m_shakeAnimation.data(), nullptr, this, nullptr);
         if (m_shakeAnimation->state() == QAbstractAnimation::Running) {
             m_shakeAnimation->stop();
         }
-        delete m_shakeAnimation;
-        m_shakeAnimation = nullptr;
+        m_shakeAnimation.clear(); // 清除 QPointer
     }
 
     // 保存每个子控件的初始位置
@@ -522,23 +524,22 @@ void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
         initialPosMap[w] = w->pos();
     }
 
-    // 使用 QVariantAnimation 统一驱动
+    // 创建新的动画
     QVariantAnimation* anim = new QVariantAnimation(this);
-    m_shakeAnimation = anim;
+    m_shakeAnimation = anim; // 正确赋值给 QPointer
 
     anim->setDuration(duration);
     anim->setStartValue(0.0);
     anim->setEndValue(1.0);
-    anim->setEasingCurve(QEasingCurve::Linear); // 手动控制轨迹
+    anim->setEasingCurve(QEasingCurve::Linear);
 
     connect(anim, &QVariantAnimation::valueChanged, this, [=](const QVariant& value) {
-        double progress = value.toDouble(); // [0,1]
-        double angle = progress * shakeCount * 2 * M_PI; // 摆动角度
-        double decay = 1.0 - progress;                  // 衰减因子（让后面震动幅度变小）
+        double progress = value.toDouble();
+        double angle = progress * shakeCount * 2 * M_PI;
+        double decay = 1.0 - progress;
 
-        // 偏移路径：圆形/椭圆形轨迹，带衰减
         double dx = amplitude * decay * std::sin(angle);
-        double dy = amplitude * decay * std::cos(angle * 0.8); // 0.8制造椭圆感
+        double dy = amplitude * decay * std::cos(angle * 0.8);
 
         QPoint offset((int)dx, (int)dy);
 
@@ -553,6 +554,10 @@ void MainWindow::onShakeWindow(int amplitude, int duration, int shakeCount)
         // 归位
         for (auto it = initialPosMap.begin(); it != initialPosMap.end(); ++it) {
             it.key()->move(it.value());
+        }
+        // 动画完成后自动清除指针
+        if (m_shakeAnimation == anim) {
+            m_shakeAnimation.clear();
         }
     });
 
