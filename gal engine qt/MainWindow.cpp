@@ -114,11 +114,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(m_engine, &ScriptEngine::shakeWindow, this, &MainWindow::onShakeWindow);
     connect(m_engine, &ScriptEngine::close, this, &MainWindow::onClose);
 
+    connect(m_engine, &ScriptEngine::onBackGame, this, &MainWindow::onReturnClicked);
+
     connect(m_engine, &ScriptEngine::stopBgm, m_audio, &AudioManager::stopBgm);
     connect(m_engine, &ScriptEngine::playBgm, m_audio, &AudioManager::playBgm);
     connect(m_engine, &ScriptEngine::playSe, m_audio, &AudioManager::playSe);
 
-    connect(m_dialogue, &DialogueBox::clicked, m_engine, &ScriptEngine::advance);
     connect(m_choices, &ChoiceOverlay::choiceSelected, m_engine, &ScriptEngine::onChoiceSelected);
 
     connect(this, &MainWindow::playSound, m_audio, &AudioManager::playSe);
@@ -575,9 +576,11 @@ void MainWindow::handleAdvance()
     if (!m_dialogue || !m_engine) return;
     if (!iswaiting){
         if (!m_dialogue->isTyping()) {
+            qDebug() << "skip animation！";
             m_dialogue->skipTyping();
         }
         else if (m_engine) {
+            qDebug() << "skip text！";
             m_engine->advance();
         }
     }
@@ -592,9 +595,6 @@ void MainWindow::mousePressEvent(QMouseEvent* ev) {
         return;
     }
 
-    // 工具栏空白区域也算点击（所以不要 return）
-
-    handleAdvance();
 }
 
 void MainWindow::handleAdvanceOrSkip() {
@@ -608,9 +608,11 @@ void MainWindow::handleAdvanceOrSkip() {
         // 默认模式 → 手动推进
         if (!iswaiting) {
             if (!m_dialogue->isTyping()) {
+                qDebug() << "skip animation！";
                 m_dialogue->skipTyping();
             }
             else if (m_engine) {
+                qDebug() << "skip text！";
                 m_engine->advance();
             }
         }

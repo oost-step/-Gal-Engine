@@ -95,10 +95,12 @@ protected:
             path.addText(0, y, font, lineText);
         }
 
-        QPen pen(QColor(255, 255, 0, 180));
-        pen.setWidthF(1.2);
+        // QPen pen(QColor(255, 255, 0, 180));  // 半透明黄色边
+        QPen pen(QColor(255, 255, 255, 180));
+        pen.setWidthF(1.0);
         painter.setPen(pen);
-        painter.setBrush(Qt::white);
+        // painter.setBrush(Qt::white);  // 白色字体
+        painter.setBrush(Qt::black);
         painter.drawPath(path);
     }
 

@@ -20,10 +20,12 @@ protected:
         QPainterPath path;
         path.addText(0, fontMetrics().ascent(), font, text);
 
-        QPen pen(QColor(255, 255, 0, 180)); // °ëÍ¸Ã÷»ÆÉ«
-        pen.setWidth(0.6);                  // ÂÖÀª´ÖÏ¸
+        // QPen pen(QColor(255, 255, 0, 180));  // °ëÍ¸Ã÷»ÆÉ«±ß
+        QPen pen(QColor(255, 255, 255, 180));
+        pen.setWidthF(1.0);
         painter.setPen(pen);
-        painter.setBrush(Qt::white);        // Ìî³äÑÕÉ«
+        // painter.setBrush(Qt::white);  // °×É«×ÖÌå
+        painter.setBrush(Qt::black);
         painter.drawPath(path);
     }
 };

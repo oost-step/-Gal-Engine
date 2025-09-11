@@ -41,7 +41,7 @@ signals:
     void autosavePoint(const QString& name);
     void shakeWindow(const int amplitude,const int duration,const int shakeCount);
     void close();
-    void requestReturnToStart();
+    void onBackGame();
 
 public slots:
     void advance();
@@ -51,9 +51,6 @@ public slots:
     void saveSnapshotWithMeta(const QString& filename,
         const QString& screenshotPath,
         const QString& desc);
-
-private slots:
-    void onBackGame();
 
 private:
     QString m_currentBgm;

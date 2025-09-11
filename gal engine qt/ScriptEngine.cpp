@@ -319,7 +319,7 @@ void ScriptEngine::handleCommand(const GE_Line& ln) {
         advance();
     }
     else if (c == "end") {
-        onBackGame();
+        emit onBackGame();
     }
     else if (c == "savehid") {
         onSaveHidGame();
@@ -440,12 +440,6 @@ void ScriptEngine::loadSnapshotFromFile(const QString& filename) {
     if (!doc.isObject()) return;
     QVariantMap m = doc.toVariant().toMap();
     restore(m);
-}
-
-void ScriptEngine::onBackGame() {
-    emit stopBgm();
-    emit requestReturnToStart(); // ²»ÔÚ engine ÄÚ new StartWindow
-    emit close();
 }
 
 void ScriptEngine::onSaveHidGame() {
